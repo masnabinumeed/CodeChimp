@@ -4,6 +4,14 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 export function VideoBanner() {
+  const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="relative h-screen w-full overflow-hidden">
       <video 
@@ -41,15 +49,17 @@ export function VideoBanner() {
           </p>
 
           <div className="flex flex-wrap gap-6">
-            <Link href="#services">
-              <a className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900">
-                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-purple-400 to-primary" />
-                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-gray-800">
-                  Explore Our Services
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </span>
-              </a>
-            </Link>
+            <a 
+              href="#services" 
+              onClick={scrollToServices}
+              className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900"
+            >
+              <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-purple-400 to-primary" />
+              <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-gray-800">
+                Explore Our Services
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </span>
+            </a>
 
             <Link href="/projects">
               <a className={cn(

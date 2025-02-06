@@ -1,6 +1,6 @@
 import { VideoBanner } from "@/components/video-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Monitor, Smartphone, Globe, Brain, Cloud, ChevronRight } from "lucide-react";
+import { Monitor, Smartphone, Globe, Brain, Cloud, ChevronRight, Bitcoin } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 
@@ -19,6 +19,11 @@ const services = [
     icon: Monitor,
     title: "Desktop Application Development",
     description: "Powerful desktop applications for Windows, macOS, and Linux."
+  },
+  {
+    icon: Bitcoin,
+    title: "Web3 & Crypto Development",
+    description: "Blockchain solutions, smart contracts, and decentralized applications (dApps)."
   },
   {
     icon: Brain,
