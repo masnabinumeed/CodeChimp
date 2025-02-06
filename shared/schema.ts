@@ -17,6 +17,16 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+export const mediaAssets = pgTable("media_assets", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type", { enum: ["image", "video", "logo"] }).notNull(),
+  url: text("url").notNull(),
+  category: text("category", { enum: ["project", "home", "brand"] }).notNull(),
+  projectId: integer("project_id").references(() => projects.id),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
 export const projectReviews = pgTable("project_reviews", {
   id: serial("id").primaryKey(),
   projectId: integer("project_id").references(() => projects.id).notNull(),
@@ -36,6 +46,12 @@ export const contactMessages = pgTable("contact_messages", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+// Insert schemas
+export const insertMediaAssetSchema = createInsertSchema(mediaAssets).omit({
+  id: true,
+  createdAt: true
+});
+
 export const insertProjectSchema = createInsertSchema(projects).omit({ 
   id: true,
   createdAt: true 
@@ -51,6 +67,9 @@ export const insertContactSchema = createInsertSchema(contactMessages).omit({
   createdAt: true 
 });
 
+// Types
+export type MediaAsset = typeof mediaAssets.$inferSelect;
+export type InsertMediaAsset = z.infer<typeof insertMediaAssetSchema>;
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
 export type ProjectReview = typeof projectReviews.$inferSelect;

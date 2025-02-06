@@ -1,7 +1,32 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import multer from "multer";
+import path from "path";
+import express from 'express';
 import { storage } from "./storage";
-import { insertContactSchema, insertProjectSchema } from "@shared/schema";
+import { insertContactSchema, insertProjectSchema, insertMediaAssetSchema } from "@shared/schema";
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: "./uploads",
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type"));
+    }
+  },
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 
 const mockReviews = [
   {
@@ -145,6 +170,25 @@ const mockProjects = [
   }
 ];
 
+const mockMediaAssets = [
+  {
+    id: 1,
+    name: "Company Logo",
+    type: "logo",
+    url: "https://example.com/logo.png",
+    category: "brand",
+    createdAt: new Date()
+  },
+  {
+    id: 2,
+    name: "Homepage Video",
+    type: "video",
+    url: "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4",
+    category: "home",
+    createdAt: new Date()
+  }
+];
+
 export function registerRoutes(app: Express): Server {
   // Projects API
   app.get("/api/projects", (_req, res) => {
@@ -175,6 +219,46 @@ export function registerRoutes(app: Express): Server {
       res.status(400).json({ error: "Invalid form data" });
     }
   });
+
+  // Media Management API
+  app.get("/api/media", (_req, res) => {
+    res.json(mockMediaAssets);
+  });
+
+  app.get("/api/media/:category", (req, res) => {
+    const { category } = req.params;
+    const filtered = category === "all" 
+      ? mockMediaAssets 
+      : mockMediaAssets.filter(m => m.category === category);
+    res.json(filtered);
+  });
+
+  app.post("/api/media/upload", upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        throw new Error("No file uploaded");
+      }
+
+      const fileUrl = `/uploads/${req.file.filename}`;
+      const mediaData = {
+        name: req.file.originalname,
+        type: req.body.type,
+        url: fileUrl,
+        category: req.body.category,
+        projectId: req.body.projectId ? parseInt(req.body.projectId) : undefined
+      };
+
+      const parsedData = insertMediaAssetSchema.parse(mediaData);
+      // Here you would normally save to database
+      // For now, we'll just return success
+      res.json({ success: true, file: parsedData });
+    } catch (error) {
+      res.status(400).json({ error: "Invalid upload data" });
+    }
+  });
+
+  // Serve uploaded files statically
+  app.use("/uploads", express.static("uploads"));
 
   return createServer(app);
 }
