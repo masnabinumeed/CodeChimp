@@ -161,21 +161,93 @@ export default function ProjectManager() {
     const techStackString = formData.get("techStack") as string;
     const techStack = techStackString.split(",").map(tech => tech.trim());
 
+    // Get existing URLs for the project if editing
+    const existingProject = formData.project;
+
     // Create the project data
     const projectData = {
+      ...(existingProject?.id ? { id: existingProject.id } : {}),
       title: formData.get("title") as string,
       description: formData.get("description") as string,
       longDescription: formData.get("longDescription") as string,
       category: selectedCategory,
       techStack,
-      imageUrls: uploadedImages,
-      videoUrls: uploadedVideos,
-      screenshots: uploadedScreenshots,
+      imageUrls: [...uploadedImages, ...(existingProject?.imageUrls || [])],
+      videoUrls: [...uploadedVideos, ...(existingProject?.videoUrls || [])],
+      screenshots: [...uploadedScreenshots, ...(existingProject?.screenshots || [])],
       demoUrl: formData.get("demoUrl") as string || null,
       githubUrl: formData.get("githubUrl") as string || null,
     };
 
-    createProjectMutation.mutate(projectData);
+    const endpoint = existingProject?.id 
+      ? `/api/projects/${existingProject.id}`
+      : "/api/projects";
+
+    const method = existingProject?.id ? "PATCH" : "POST";
+
+    try {
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || `Failed to ${existingProject?.id ? 'update' : 'create'} project`);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      handleDialogChange(false);
+      toast({
+        title: "Success",
+        description: `Project ${existingProject?.id ? 'updated' : 'created'} successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to save project",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const removeImage = (url: string, isExisting: boolean = false) => {
+    if (isExisting && formData.project) {
+      const updatedProject = {
+        ...formData.project,
+        imageUrls: formData.project.imageUrls.filter(i => i !== url)
+      };
+      setFormData({ ...formData, project: updatedProject });
+    } else {
+      setUploadedImages(prev => prev.filter(i => i !== url));
+    }
+  };
+
+  const removeVideo = (url: string, isExisting: boolean = false) => {
+    if (isExisting && formData.project) {
+      const updatedProject = {
+        ...formData.project,
+        videoUrls: formData.project.videoUrls.filter(v => v !== url)
+      };
+      setFormData({ ...formData, project: updatedProject });
+    } else {
+      setUploadedVideos(prev => prev.filter(v => v !== url));
+    }
+  };
+
+  const removeScreenshot = (url: string, isExisting: boolean = false) => {
+    if (isExisting && formData.project) {
+      const updatedProject = {
+        ...formData.project,
+        screenshots: formData.project.screenshots.filter(s => s !== url)
+      };
+      setFormData({ ...formData, project: updatedProject });
+    } else {
+      setUploadedScreenshots(prev => prev.filter(s => s !== url));
+    }
   };
 
   return (
@@ -357,14 +429,17 @@ export default function ProjectManager() {
                     </div>
                     {/* Preview grid for uploaded and existing images */}
                     <div className="grid grid-cols-4 gap-4 mt-4">
-                      {[...uploadedImages, ...(formData.project?.imageUrls || [])].map((url, index) => (
+                      {[
+                        ...uploadedImages.map(url => ({ url, isExisting: false })),
+                        ...(formData.project?.imageUrls || []).map(url => ({ url, isExisting: true }))
+                      ].map(({ url, isExisting }) => (
                         <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                          <img src={url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+                          <img src={url} alt="Project image" className="w-full h-full object-cover" />
                           <Button
                             variant="destructive"
                             size="sm"
                             className="absolute top-2 right-2"
-                            onClick={() => setUploadedImages(prev => prev.filter(i => i !== url))}
+                            onClick={() => removeImage(url, isExisting)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -392,14 +467,17 @@ export default function ProjectManager() {
                     </div>
                     {/* Preview grid for uploaded and existing videos */}
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                      {[...uploadedVideos, ...(formData.project?.videoUrls || [])].map((url, index) => (
+                      {[
+                        ...uploadedVideos.map(url => ({ url, isExisting: false })),
+                        ...(formData.project?.videoUrls || []).map(url => ({ url, isExisting: true }))
+                      ].map(({ url, isExisting }) => (
                         <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
                           <video src={url} controls className="w-full h-full object-cover" />
                           <Button
                             variant="destructive"
                             size="sm"
                             className="absolute top-2 right-2"
-                            onClick={() => setUploadedVideos(prev => prev.filter(i => i !== url))}
+                            onClick={() => removeVideo(url, isExisting)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -436,14 +514,17 @@ export default function ProjectManager() {
                     </div>
                     {/* Preview grid for uploaded and existing screenshots */}
                     <div className="grid grid-cols-4 gap-4 mt-4">
-                      {[...uploadedScreenshots, ...(formData.project?.screenshots || [])].map((url, index) => (
+                      {[
+                        ...uploadedScreenshots.map(url => ({ url, isExisting: false })),
+                        ...(formData.project?.screenshots || []).map(url => ({ url, isExisting: true }))
+                      ].map(({ url, isExisting }) => (
                         <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                          <img src={url} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
+                          <img src={url} alt="Screenshot" className="w-full h-full object-cover" />
                           <Button
                             variant="destructive"
                             size="sm"
                             className="absolute top-2 right-2"
-                            onClick={() => setUploadedScreenshots(prev => prev.filter(i => i !== url))}
+                            onClick={() => removeScreenshot(url, isExisting)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

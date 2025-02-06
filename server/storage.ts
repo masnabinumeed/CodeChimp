@@ -21,6 +21,7 @@ export interface IStorage {
   getProjectReviews(projectId: number): Promise<ProjectReview[]>;
   createProject(project: InsertProject): Promise<Project>;
   createProjectReview(review: InsertProjectReview): Promise<ProjectReview>;
+  updateProject(id: number, project: InsertProject): Promise<Project>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -87,6 +88,15 @@ export class DatabaseStorage implements IStorage {
       .values(review)
       .returning();
     return newReview;
+  }
+
+  async updateProject(id: number, project: InsertProject): Promise<Project> {
+    const [updatedProject] = await db
+      .update(projects)
+      .set(project)
+      .where(eq(projects.id, id))
+      .returning();
+    return updatedProject;
   }
 }
 

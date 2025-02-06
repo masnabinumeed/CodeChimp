@@ -81,6 +81,18 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.patch("/api/projects/:id", async (req, res) => {
+    try {
+      const projectId = parseInt(req.params.id);
+      const data = insertProjectSchema.parse(req.body);
+      const updatedProject = await storage.updateProject(projectId, data);
+      res.json(updatedProject);
+    } catch (error) {
+      console.error('Project update error:', error);
+      res.status(400).json({ error: "Invalid project data" });
+    }
+  });
+
   app.post("/api/projects/:projectId/reviews", async (req, res) => {
     try {
       const data = insertReviewSchema.parse({
