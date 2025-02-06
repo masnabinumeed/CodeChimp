@@ -34,6 +34,8 @@ export default function MediaManager() {
   const [selectedCategory, setSelectedCategory] = useState("home");
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const botIconInputRef = useRef<HTMLInputElement>(null);
+  const videoBannerInputRef = useRef<HTMLInputElement>(null);
 
   const { data: assets = [], isLoading } = useQuery<MediaAsset[]>({
     queryKey: [`/api/media/${activeTab}`]
@@ -50,37 +52,40 @@ export default function MediaManager() {
         body: formData,
       });
       if (!response.ok) {
-        throw new Error("Upload failed");
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/media"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/media/home"] });
       toast({
         title: "Success",
         description: "Media uploaded successfully",
       });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      // Reset all file inputs
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (botIconInputRef.current) botIconInputRef.current.value = "";
+      if (videoBannerInputRef.current) videoBannerInputRef.current.value = "";
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to upload media",
+        description: error.message || "Failed to upload media",
         variant: "destructive",
       });
     },
   });
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, type: string, category: string) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("type", selectedType);
-    formData.append("category", selectedCategory);
+    formData.append("type", type);
+    formData.append("category", category);
 
     uploadMutation.mutate(formData);
   };
@@ -121,22 +126,16 @@ export default function MediaManager() {
                 <div className="flex-1">
                   <div className="flex gap-4">
                     <Input
+                      ref={botIconInputRef}
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        setSelectedType("logo");
-                        setSelectedCategory("home");
-                        handleFileUpload(e);
-                      }}
-                      className="flex-1"
+                      onChange={(e) => handleFileUpload(e, "logo", "home")}
+                      className="hidden"
                     />
                     <Button 
-                      onClick={() => {
-                        setSelectedType("logo");
-                        setSelectedCategory("home");
-                        fileInputRef.current?.click();
-                      }}
+                      onClick={() => botIconInputRef.current?.click()}
                       disabled={uploadMutation.isPending}
+                      className="w-full"
                     >
                       {uploadMutation.isPending ? "Uploading..." : "Change Icon"}
                     </Button>
@@ -174,22 +173,16 @@ export default function MediaManager() {
                 </div>
                 <div className="flex gap-4">
                   <Input
+                    ref={videoBannerInputRef}
                     type="file"
                     accept="video/*"
-                    onChange={(e) => {
-                      setSelectedType("video");
-                      setSelectedCategory("home");
-                      handleFileUpload(e);
-                    }}
-                    className="flex-1"
+                    onChange={(e) => handleFileUpload(e, "video", "home")}
+                    className="hidden"
                   />
                   <Button 
-                    onClick={() => {
-                      setSelectedType("video");
-                      setSelectedCategory("home");
-                      fileInputRef.current?.click();
-                    }}
+                    onClick={() => videoBannerInputRef.current?.click()}
                     disabled={uploadMutation.isPending}
+                    className="w-full"
                   >
                     {uploadMutation.isPending ? "Uploading..." : "Change Video"}
                   </Button>
@@ -281,7 +274,7 @@ export default function MediaManager() {
                     ref={fileInputRef}
                     type="file"
                     accept="image/*,video/*"
-                    onChange={handleFileUpload}
+                    onChange={(e) => handleFileUpload(e, selectedType, activeTab)}
                     className="flex-1"
                   />
                   <Button 
