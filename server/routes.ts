@@ -110,6 +110,38 @@ const mockProjects = [
     demoUrl: "https://demo.example.com",
     githubUrl: "https://github.com/example/project",
     createdAt: new Date()
+  },
+  {
+    id: 4,
+    title: "DeFi Trading Platform",
+    description: "Decentralized cryptocurrency trading platform with real-time market data.",
+    longDescription: `A modern DeFi trading platform that enables users to trade cryptocurrencies with advanced features:
+
+    Key Features:
+    - Real-time market data visualization
+    - Smart contract integration
+    - Multi-wallet support
+    - Advanced trading features
+    - Performance analytics dashboard
+
+    Built with React and Ethers.js, using Web3 technologies for blockchain integration.`,
+    category: "web",
+    techStack: ["React", "Ethers.js", "Web3.js", "TailwindCSS", "Node.js"],
+    imageUrls: [
+      "https://images.unsplash.com/photo-1639762681485-074b7f938ba0", 
+      "https://images.unsplash.com/photo-1518546305927-5a555bb7020d"  
+    ],
+    videoUrls: [
+      "https://static.videezy.com/system/resources/previews/000/051/975/original/data8001.mp4" 
+    ],
+    screenshots: [
+      "https://images.unsplash.com/photo-1640340434855-6084b1f4901c", 
+      "https://images.unsplash.com/photo-1643101452019-bc00c9bba76b", 
+      "https://images.unsplash.com/photo-1642784353782-096dc9ca1624"  
+    ],
+    demoUrl: "https://demo.example.com/defi",
+    githubUrl: "https://github.com/example/defi-platform",
+    createdAt: new Date()
   }
 ];
 
