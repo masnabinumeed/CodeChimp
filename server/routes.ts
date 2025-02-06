@@ -28,6 +28,28 @@ const upload = multer({
   }
 });
 
+// In-memory storage for uploaded files
+let mediaAssets = [
+  {
+    id: 1,
+    name: "Company Logo",
+    type: "logo",
+    url: "https://example.com/logo.png",
+    category: "brand",
+    createdAt: new Date()
+  },
+  {
+    id: 2,
+    name: "Homepage Video",
+    type: "video",
+    url: "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4",
+    category: "home",
+    createdAt: new Date()
+  }
+];
+
+let nextMediaId = 3;
+
 const mockReviews = [
   {
     id: 1,
@@ -170,25 +192,6 @@ const mockProjects = [
   }
 ];
 
-const mockMediaAssets = [
-  {
-    id: 1,
-    name: "Company Logo",
-    type: "logo",
-    url: "https://example.com/logo.png",
-    category: "brand",
-    createdAt: new Date()
-  },
-  {
-    id: 2,
-    name: "Homepage Video",
-    type: "video",
-    url: "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4",
-    category: "home",
-    createdAt: new Date()
-  }
-];
-
 export function registerRoutes(app: Express): Server {
   // Projects API
   app.get("/api/projects", (_req, res) => {
@@ -222,14 +225,14 @@ export function registerRoutes(app: Express): Server {
 
   // Media Management API
   app.get("/api/media", (_req, res) => {
-    res.json(mockMediaAssets);
+    res.json(mediaAssets);
   });
 
   app.get("/api/media/:category", (req, res) => {
     const { category } = req.params;
     const filtered = category === "all" 
-      ? mockMediaAssets 
-      : mockMediaAssets.filter(m => m.category === category);
+      ? mediaAssets 
+      : mediaAssets.filter(m => m.category === category);
     res.json(filtered);
   });
 
@@ -241,16 +244,17 @@ export function registerRoutes(app: Express): Server {
 
       const fileUrl = `/uploads/${req.file.filename}`;
       const mediaData = {
+        id: nextMediaId++,
         name: req.file.originalname,
         type: req.body.type,
         url: fileUrl,
         category: req.body.category,
-        projectId: req.body.projectId ? parseInt(req.body.projectId) : undefined
+        projectId: req.body.projectId ? parseInt(req.body.projectId) : undefined,
+        createdAt: new Date()
       };
 
       const parsedData = insertMediaAssetSchema.parse(mediaData);
-      // Here you would normally save to database
-      // For now, we'll just return success
+      mediaAssets.push(mediaData);
       res.json({ success: true, file: parsedData });
     } catch (error) {
       res.status(400).json({ error: "Invalid upload data" });
