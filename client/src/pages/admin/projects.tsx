@@ -131,16 +131,25 @@ export default function ProjectManager() {
     },
   });
 
-  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", files[0]);
     formData.append("type", type);
     formData.append("category", "project");
 
-    uploadMediaMutation.mutate(formData);
+    try {
+      uploadMediaMutation.mutate(formData);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to upload file",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -190,8 +199,8 @@ export default function ProjectManager() {
             <Card key={project.id}>
               <div className="aspect-video relative overflow-hidden">
                 {project.imageUrls[0] && (
-                  <img 
-                    src={project.imageUrls[0]} 
+                  <img
+                    src={project.imageUrls[0]}
                     alt={project.title}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -214,8 +223,8 @@ export default function ProjectManager() {
                     <Star className="w-4 h-4" />
                     {project.reviews?.length || 0} Reviews
                   </div>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => setFormData({ project, isOpen: true })}
                   >
@@ -250,18 +259,18 @@ export default function ProjectManager() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Project Title</label>
-                    <Input 
-                      name="title" 
-                      required 
+                    <Input
+                      name="title"
+                      required
                       defaultValue={formData.project?.title}
-                      placeholder="Enter project title" 
+                      placeholder="Enter project title"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Category</label>
-                    <Select 
-                      value={selectedCategory} 
+                    <Select
+                      value={selectedCategory}
                       onValueChange={setSelectedCategory}
                     >
                       <SelectTrigger>
@@ -279,39 +288,39 @@ export default function ProjectManager() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Short Description</label>
-                    <Input 
-                      name="description" 
-                      required 
+                    <Input
+                      name="description"
+                      required
                       defaultValue={formData.project?.description}
-                      placeholder="Brief project description" 
+                      placeholder="Brief project description"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Tech Stack</label>
-                    <Input 
-                      name="techStack" 
-                      required 
+                    <Input
+                      name="techStack"
+                      required
                       defaultValue={formData.project?.techStack.join(", ")}
-                      placeholder="React, Node.js, PostgreSQL (comma-separated)" 
+                      placeholder="React, Node.js, PostgreSQL (comma-separated)"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Demo URL</label>
-                    <Input 
-                      name="demoUrl" 
+                    <Input
+                      name="demoUrl"
                       defaultValue={formData.project?.demoUrl || ""}
-                      placeholder="https://demo.example.com" 
+                      placeholder="https://demo.example.com"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">GitHub URL</label>
-                    <Input 
-                      name="githubUrl" 
+                    <Input
+                      name="githubUrl"
                       defaultValue={formData.project?.githubUrl || ""}
-                      placeholder="https://github.com/example/project" 
+                      placeholder="https://github.com/example/project"
                     />
                   </div>
 
@@ -336,7 +345,7 @@ export default function ProjectManager() {
                       <Input
                         type="file"
                         accept="image/*"
-                        onChange={(e) => handleMediaUpload(e, "image")}
+                        onChange={(e) => handleFileUpload(e, "image")}
                         className="flex-1"
                       />
                       <Button
@@ -371,7 +380,7 @@ export default function ProjectManager() {
                       <Input
                         type="file"
                         accept="video/*"
-                        onChange={(e) => handleMediaUpload(e, "video")}
+                        onChange={(e) => handleFileUpload(e, "video")}
                         className="flex-1"
                       />
                       <Button
@@ -453,39 +462,125 @@ export default function ProjectManager() {
                       <CardTitle>Add Review</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Customer Name</label>
-                          <Input name="customerName" required />
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const form = e.currentTarget;
+                          const formData = new FormData(form);
+
+                          try {
+                            // First upload the avatar if provided
+                            let avatarUrl = null;
+                            const avatarFile = (form.querySelector('input[name="avatar"]') as HTMLInputElement).files?.[0];
+
+                            if (avatarFile) {
+                              const avatarFormData = new FormData();
+                              avatarFormData.append("file", avatarFile);
+                              avatarFormData.append("type", "avatar");
+                              avatarFormData.append("category", "project");
+
+                              const uploadResponse = await fetch("/api/media/upload", {
+                                method: "POST",
+                                body: avatarFormData,
+                              });
+
+                              if (!uploadResponse.ok) {
+                                throw new Error("Failed to upload avatar");
+                              }
+
+                              const { file } = await uploadResponse.json();
+                              avatarUrl = file.url;
+                            }
+
+                            // Then submit the review with the avatar URL
+                            const response = await fetch(`/api/projects/${formData.project?.id}/reviews`, {
+                              method: "POST",
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({
+                                customerName: formData.get("customerName") as string,
+                                customerCompany: formData.get("customerCompany") as string || null,
+                                customerAvatar: avatarUrl,
+                                rating: parseInt(formData.get("rating") as string),
+                                review: formData.get("review") as string,
+                              }),
+                            });
+
+                            if (!response.ok) {
+                              throw new Error("Failed to add review");
+                            }
+
+                            queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+                            form.reset();
+                            toast({
+                              title: "Success",
+                              description: "Review added successfully",
+                            });
+                          } catch (error) {
+                            toast({
+                              title: "Error",
+                              description: error instanceof Error ? error.message : "Failed to add review",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className="space-y-4"
+                      >
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Customer Name</label>
+                            <Input name="customerName" required />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Company</label>
+                            <Input name="customerCompany" />
+                          </div>
                         </div>
+
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Company</label>
-                          <Input name="customerCompany" />
+                          <label className="text-sm font-medium">Avatar</label>
+                          <Input
+                            name="avatar"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file && file.size > 5 * 1024 * 1024) {
+                                toast({
+                                  title: "Error",
+                                  description: "Avatar image must be less than 5MB",
+                                  variant: "destructive",
+                                });
+                                e.target.value = '';
+                              }
+                            }}
+                          />
+                          <p className="text-sm text-muted-foreground">
+                            Upload a profile picture (max 5MB)
+                          </p>
                         </div>
-                      </div>
-                      <div className="space-y-2 mt-4">
-                        <label className="text-sm font-medium">Avatar URL</label>
-                        <Input name="customerAvatar" type="url" placeholder="https://example.com/avatar.jpg" />
-                      </div>
-                      <div className="space-y-2 mt-4">
-                        <label className="text-sm font-medium">Rating (1-5)</label>
-                        <Select name="rating" defaultValue="5">
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select rating" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[1, 2, 3, 4, 5].map((rating) => (
-                              <SelectItem key={rating} value={rating.toString()}>
-                                {rating} Star{rating !== 1 ? 's' : ''}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2 mt-4">
-                        <label className="text-sm font-medium">Review</label>
-                        <Textarea name="review" required />
-                      </div>
+
+                        <div className="space-y-2 mt-4">
+                          <label className="text-sm font-medium">Rating (1-5)</label>
+                          <Select name="rating" defaultValue="5">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select rating" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5].map((rating) => (
+                                <SelectItem key={rating} value={rating.toString()}>
+                                  {rating} Star{rating !== 1 ? 's' : ''}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2 mt-4">
+                          <label className="text-sm font-medium">Review</label>
+                          <Textarea name="review" required />
+                        </div>
+                      </form>
                     </CardContent>
                   </Card>
 
