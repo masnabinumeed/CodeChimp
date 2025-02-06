@@ -29,17 +29,60 @@ const categories = [
 
 export default function ProjectManager() {
   const [selectedCategory, setSelectedCategory] = useState("web");
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [uploadedVideos, setUploadedVideos] = useState<string[]>([]);
+  const [uploadedScreenshots, setUploadedScreenshots] = useState<string[]>([]);
   const { toast } = useToast();
 
   const { data: projects = [], isLoading } = useQuery<Project[]>({
     queryKey: ["/api/projects"]
   });
 
+  const uploadMediaMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch("/api/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to upload media");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      const fileUrl = data.file.url;
+      const fileType = data.file.type;
+
+      if (fileType === "image") {
+        setUploadedImages(prev => [...prev, fileUrl]);
+      } else if (fileType === "video") {
+        setUploadedVideos(prev => [...prev, fileUrl]);
+      } else if (fileType === "screenshot") {
+        setUploadedScreenshots(prev => [...prev, fileUrl]);
+      }
+      toast({
+        title: "Success",
+        description: "Media uploaded successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload media",
+        variant: "destructive",
+      });
+    },
+  });
+
   const createProjectMutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await fetch("/api/projects", {
         method: "POST",
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(Object.fromEntries(formData)),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -49,6 +92,10 @@ export default function ProjectManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      // Reset form and uploaded media arrays
+      setUploadedImages([]);
+      setUploadedVideos([]);
+      setUploadedScreenshots([]);
       toast({
         title: "Success",
         description: "Project created successfully",
@@ -63,15 +110,27 @@ export default function ProjectManager() {
     },
   });
 
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", type);
+    formData.append("category", "project");
+
+    uploadMediaMutation.mutate(formData);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
-    
+
     // Convert tech stack string to array
     const techStackString = formData.get("techStack") as string;
     const techStack = techStackString.split(",").map(tech => tech.trim());
-    
+
     // Create the project data
     const projectData = {
       title: formData.get("title"),
@@ -79,14 +138,14 @@ export default function ProjectManager() {
       longDescription: formData.get("longDescription"),
       category: selectedCategory,
       techStack,
-      imageUrls: [],
-      videoUrls: [],
-      screenshots: [],
-      demoUrl: formData.get("demoUrl"),
-      githubUrl: formData.get("githubUrl"),
+      imageUrls: uploadedImages,
+      videoUrls: uploadedVideos,
+      screenshots: uploadedScreenshots,
+      demoUrl: formData.get("demoUrl") || null,
+      githubUrl: formData.get("githubUrl") || null,
     };
 
-    createProjectMutation.mutate(formData);
+    createProjectMutation.mutate(projectData); // Mutate with projectData instead of formData
   };
 
   return (
@@ -149,6 +208,126 @@ export default function ProjectManager() {
                   placeholder="Detailed project description with features and technical details"
                   className="min-h-[200px]"
                 />
+              </div>
+
+              {/* Media Upload Section */}
+              <div className="col-span-2 space-y-4">
+                <h3 className="text-lg font-medium">Media</h3>
+
+                {/* Main Image */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Main Images</label>
+                  <div className="flex gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleMediaUpload(e, "image")}
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button"
+                      disabled={uploadMediaMutation.isPending}
+                      onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
+                    >
+                      {uploadMediaMutation.isPending ? "Uploading..." : "Upload Image"}
+                    </Button>
+                  </div>
+                  {/* Preview uploaded images */}
+                  <div className="grid grid-cols-4 gap-4 mt-4">
+                    {uploadedImages.map((url, index) => (
+                      <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        <img src={url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2"
+                          onClick={() => setUploadedImages(prev => prev.filter(i => i !== url))}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Videos */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Videos</label>
+                  <div className="flex gap-4">
+                    <Input
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => handleMediaUpload(e, "video")}
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button"
+                      disabled={uploadMediaMutation.isPending}
+                    >
+                      {uploadMediaMutation.isPending ? "Uploading..." : "Upload Video"}
+                    </Button>
+                  </div>
+                  {/* Preview uploaded videos */}
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    {uploadedVideos.map((url, index) => (
+                      <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        <video src={url} controls className="w-full h-full object-cover" />
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2"
+                          onClick={() => setUploadedVideos(prev => prev.filter(i => i !== url))}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Screenshots */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Screenshots</label>
+                  <div className="flex gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        Array.from(e.target.files || []).forEach(file => {
+                          const formData = new FormData();
+                          formData.append("file", file);
+                          formData.append("type", "screenshot");
+                          formData.append("category", "project");
+                          uploadMediaMutation.mutate(formData);
+                        });
+                      }}
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button"
+                      disabled={uploadMediaMutation.isPending}
+                    >
+                      {uploadMediaMutation.isPending ? "Uploading..." : "Upload Screenshots"}
+                    </Button>
+                  </div>
+                  {/* Preview uploaded screenshots */}
+                  <div className="grid grid-cols-4 gap-4 mt-4">
+                    {uploadedScreenshots.map((url, index) => (
+                      <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        <img src={url} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-2 right-2"
+                          onClick={() => setUploadedScreenshots(prev => prev.filter(i => i !== url))}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 
