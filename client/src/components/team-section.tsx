@@ -1,24 +1,22 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Code2, Smartphone, Globe } from "lucide-react";
 
-const teamMembers = [
+const services = [
   {
-    name: "Alex Chen",
-    role: "Full Stack Developer",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7",
-    description: "Expert in React and Node.js with 8+ years of experience building scalable applications."
+    name: "Web Development",
+    icon: Globe,
+    description: "Building responsive and scalable web applications using cutting-edge technologies."
   },
   {
-    name: "Sarah Johnson",
-    role: "UI/UX Designer",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-    description: "Creative designer passionate about crafting beautiful and intuitive user experiences."
+    name: "Mobile Development",
+    icon: Smartphone,
+    description: "Creating native and cross-platform mobile apps that deliver exceptional user experiences."
   },
   {
-    name: "Michael Rodriguez",
-    role: "Backend Architect",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
-    description: "Database expert specializing in high-performance distributed systems."
+    name: "Custom Solutions",
+    icon: Code2,
+    description: "Developing tailored software solutions to meet your unique business requirements."
   }
 ];
 
@@ -31,13 +29,13 @@ export function TeamSection() {
         transition={{ duration: 0.6 }}
         className="text-3xl md:text-4xl font-bold text-white mb-12 text-center"
       >
-        Why Choose Tech Monkeys?
+        Our Services
       </motion.h2>
 
       <div className="flex overflow-x-auto pb-8 gap-6 snap-x snap-mandatory no-scrollbar">
-        {teamMembers.map((member, index) => (
+        {services.map((service, index) => (
           <motion.div
-            key={member.name}
+            key={service.name}
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
@@ -47,17 +45,12 @@ export function TeamSection() {
               "flex flex-col items-center text-center"
             )}
           >
-            <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-primary">
-              <img 
-                src={member.image} 
-                alt={member.name}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <service.icon className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-1">{member.name}</h3>
-            <p className="text-sm text-primary mb-4">{member.role}</p>
+            <h3 className="text-xl font-semibold text-white mb-4">{service.name}</h3>
             <p className="text-gray-300 text-sm leading-relaxed">
-              {member.description}
+              {service.description}
             </p>
           </motion.div>
         ))}
