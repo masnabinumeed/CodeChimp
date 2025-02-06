@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bot } from "lucide-react";
 
 export function VideoBanner() {
   const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -38,11 +38,15 @@ export function VideoBanner() {
           className="max-w-3xl"
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-            Building{" "}
-            <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
-              Tomorrow's
-            </span>{" "}
-            Technology Today
+            <span className="flex items-center gap-4">
+              <Bot className="w-12 h-12 text-primary animate-bounce" />
+              <span>
+                <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
+                  Tech Monkeys
+                </span>
+              </span>
+            </span>
+            Building Tomorrow's Technology Today
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mb-12 leading-relaxed">
             We craft innovative solutions across web, mobile, and desktop platforms to bring your ideas to life.
