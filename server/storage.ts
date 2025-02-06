@@ -11,11 +11,6 @@ export interface IStorage {
 
   // Contact form
   createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
-
-  //User Management (from original code)
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -48,16 +43,6 @@ export class DatabaseStorage implements IStorage {
       .values(message)
       .returning();
     return newMessage;
-  }
-
-  async getUser(id: number): Promise<User | undefined> {
-    throw new Error("Method not implemented.");
-  }
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    throw new Error("Method not implemented.");
-  }
-  async createUser(user: InsertUser): Promise<User> {
-    throw new Error("Method not implemented.");
   }
 }
 
