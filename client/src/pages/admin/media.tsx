@@ -143,32 +143,42 @@ export default function MediaManager() {
         </TabsList>
       </Tabs>
 
+      {/* Media Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((n) => (
             <div key={n} className="aspect-video rounded-lg bg-gray-100 animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {assets.map((asset) => (
             <Card key={asset.id} className="overflow-hidden">
-              {asset.type === "video" ? (
-                <video
-                  src={asset.url}
-                  controls
-                  className="w-full aspect-video object-cover"
-                />
-              ) : (
-                <img
-                  src={asset.url}
-                  alt={asset.name}
-                  className="w-full aspect-video object-cover"
-                />
-              )}
+              <div className="aspect-video relative">
+                {asset.type === "video" ? (
+                  <video
+                    src={asset.url}
+                    controls
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={asset.url}
+                    alt={asset.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+              </div>
               <CardContent className="p-4">
-                <p className="font-medium">{asset.name}</p>
-                <p className="text-sm text-muted-foreground capitalize">{asset.type}</p>
+                <p className="font-medium truncate">{asset.name}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-sm text-muted-foreground capitalize">
+                    {asset.type}
+                  </span>
+                  <span className="text-sm text-muted-foreground capitalize">
+                    {asset.category}
+                  </span>
+                </div>
               </CardContent>
             </Card>
           ))}
