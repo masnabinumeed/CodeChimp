@@ -1,13 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Settings } from "lucide-react";
 
 export function NavHeader() {
   const [location] = useLocation();
@@ -47,27 +40,6 @@ export function NavHeader() {
               {link.label}
             </NavLink>
           ))}
-
-          {/* Admin Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-2 rounded-full hover:bg-gray-800 transition-colors">
-                <Settings className="h-5 w-5 text-gray-400 hover:text-white" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link href="/admin/media" className="w-full">
-                  Media Manager
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin/projects" className="w-full">
-                  Project Manager
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </nav>
     </motion.header>
