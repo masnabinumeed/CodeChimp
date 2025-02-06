@@ -157,19 +157,19 @@ export default function ProjectManager() {
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    // Convert tech stack string to array
-    const techStackString = formData.get("techStack") as string;
-    const techStack = techStackString.split(",").map(tech => tech.trim());
+    // Convert tech stack string to array with proper null checking
+    const techStackString = formData.get("techStack") as string | null;
+    const techStack = techStackString ? techStackString.split(",").map(tech => tech.trim()).filter(Boolean) : [];
 
-    // Get existing URLs for the project if editing
-    const existingProject = formData.project;
+    // Get existing project data if editing
+    const existingProject = formData.project as (Project & { reviews?: ProjectReview[] }) | undefined;
 
     // Create the project data
     const projectData = {
       ...(existingProject?.id ? { id: existingProject.id } : {}),
       title: formData.get("title") as string,
       description: formData.get("description") as string,
-      longDescription: formData.get("longDescription") as string,
+      longDescription: formData.get("longDescription") as string || "",
       category: selectedCategory,
       techStack,
       imageUrls: [...uploadedImages, ...(existingProject?.imageUrls || [])],
@@ -179,20 +179,17 @@ export default function ProjectManager() {
       githubUrl: formData.get("githubUrl") as string || null,
     };
 
-    const endpoint = existingProject?.id 
-      ? `/api/projects/${existingProject.id}`
-      : "/api/projects";
-
-    const method = existingProject?.id ? "PATCH" : "POST";
-
     try {
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(projectData),
-      });
+      const response = await fetch(
+        existingProject?.id ? `/api/projects/${existingProject.id}` : "/api/projects",
+        {
+          method: existingProject?.id ? "PATCH" : "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(projectData),
+        }
+      );
 
       if (!response.ok) {
         const error = await response.json();
