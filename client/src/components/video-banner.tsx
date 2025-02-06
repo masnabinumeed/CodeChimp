@@ -1,15 +1,17 @@
 import { cn } from "@/lib/utils";
 import { Link } from "wouter";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 
 export function VideoBanner() {
   return (
-    <div className="relative h-[80vh] w-full overflow-hidden">
+    <div className="relative h-screen w-full overflow-hidden">
       <video 
         autoPlay 
         muted 
         loop
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover scale-105"
         poster="https://images.unsplash.com/photo-1531297484001-80022131f5a1"
       >
         <source 
@@ -18,34 +20,62 @@ export function VideoBanner() {
         />
       </video>
 
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900" />
 
       <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-start">
-        <h1 className="text-4xl md:text-6xl font-bold text-white max-w-2xl mb-6">
-          Building Tomorrow's Technology Today
-        </h1>
-        <p className="text-lg md:text-xl text-gray-200 max-w-xl mb-8">
-          We craft innovative solutions across web, mobile, and desktop platforms to bring your ideas to life.
-        </p>
-        <div className="flex gap-4">
-          <a 
-            href="#services"
-            className={cn(
-              "px-6 py-3 rounded-md bg-primary text-white font-medium",
-              "hover:bg-primary/90 transition-colors"
-            )}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="max-w-3xl"
+        >
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+            Building{" "}
+            <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
+              Tomorrow's
+            </span>{" "}
+            Technology Today
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mb-12 leading-relaxed">
+            We craft innovative solutions across web, mobile, and desktop platforms to bring your ideas to life.
+          </p>
+
+          <div className="flex flex-wrap gap-6">
+            <Link href="#services">
+              <a className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900">
+                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-purple-400 to-primary" />
+                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-gray-800">
+                  Explore Our Services
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </span>
+              </a>
+            </Link>
+
+            <Link href="/projects">
+              <a className={cn(
+                "inline-flex items-center justify-center px-6 py-3 rounded-full",
+                "bg-white/10 backdrop-blur-lg text-white",
+                "hover:bg-white/20 transition-colors duration-300",
+                "border border-white/20 hover:border-white/40"
+              )}>
+                View Projects
+              </a>
+            </Link>
+          </div>
+        </motion.div>
+
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-6 h-10 rounded-full border-2 border-white/20 p-1"
           >
-            Our Services
-          </a>
-          <Link 
-            href="/projects"
-            className={cn(
-              "px-6 py-3 rounded-md bg-white text-primary font-medium",
-              "hover:bg-gray-100 transition-colors"
-            )}
-          >
-            View Projects
-          </Link>
+            <motion.div
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              className="w-1 h-2 bg-white/60 rounded-full mx-auto"
+            />
+          </motion.div>
         </div>
       </div>
     </div>
