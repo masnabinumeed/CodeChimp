@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -16,9 +22,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Trash2, Star } from "lucide-react";
-import type { Project, InsertProject, ProjectReview } from "@shared/schema"; // Added import for ProjectReview
+import { Upload, Trash2, Star, Plus, Edit } from "lucide-react";
+import type { Project, InsertProject, ProjectReview } from "@shared/schema";
 import { queryClient } from "@/lib/queryClient";
 
 const categories = [
@@ -27,17 +34,33 @@ const categories = [
   { value: "desktop", label: "Desktop" }
 ];
 
+interface ProjectFormData {
+  project?: Project & { reviews?: ProjectReview[] };
+  isOpen: boolean;
+}
+
 export default function ProjectManager() {
-  const [selectedCategory, setSelectedCategory] = useState("web");
+  const [formData, setFormData] = useState<ProjectFormData>({ isOpen: false });
+  const [selectedCategory, setSelectedCategory] = useState<"web" | "mobile" | "desktop">("web");
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [uploadedVideos, setUploadedVideos] = useState<string[]>([]);
   const [uploadedScreenshots, setUploadedScreenshots] = useState<string[]>([]);
   const { toast } = useToast();
 
-  // Update the query to include project reviews
   const { data: projects = [], isLoading } = useQuery<(Project & { reviews: ProjectReview[] })[]>({
     queryKey: ["/api/projects"]
   });
+
+  // Reset form data when dialog is closed
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setFormData({ isOpen: false });
+      setUploadedImages([]);
+      setUploadedVideos([]);
+      setUploadedScreenshots([]);
+      setSelectedCategory("web");
+    }
+  };
 
   const uploadMediaMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -93,19 +116,16 @@ export default function ProjectManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      // Reset form and uploaded media arrays
-      setUploadedImages([]);
-      setUploadedVideos([]);
-      setUploadedScreenshots([]);
+      handleDialogChange(false);
       toast({
         title: "Success",
-        description: "Project created successfully",
+        description: "Project saved successfully",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create project",
+        description: error.message || "Failed to save project",
         variant: "destructive",
       });
     },
@@ -151,197 +171,13 @@ export default function ProjectManager() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Project Manager</h1>
-
-      {/* Create New Project Form */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Create New Project</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Project Title</label>
-                <Input name="title" required placeholder="Enter project title" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Category</label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(cat => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Short Description</label>
-                <Input name="description" required placeholder="Brief project description" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Tech Stack</label>
-                <Input name="techStack" required placeholder="React, Node.js, PostgreSQL (comma-separated)" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Demo URL</label>
-                <Input name="demoUrl" placeholder="https://demo.example.com" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">GitHub URL</label>
-                <Input name="githubUrl" placeholder="https://github.com/example/project" />
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <label className="text-sm font-medium">Long Description</label>
-                <Textarea
-                  name="longDescription"
-                  placeholder="Detailed project description with features and technical details"
-                  className="min-h-[200px]"
-                />
-              </div>
-
-              {/* Media Upload Section */}
-              <div className="col-span-2 space-y-4">
-                <h3 className="text-lg font-medium">Media</h3>
-
-                {/* Main Image */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Main Images</label>
-                  <div className="flex gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleMediaUpload(e, "image")}
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      disabled={uploadMediaMutation.isPending}
-                      onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
-                    >
-                      {uploadMediaMutation.isPending ? "Uploading..." : "Upload Image"}
-                    </Button>
-                  </div>
-                  {/* Preview uploaded images */}
-                  <div className="grid grid-cols-4 gap-4 mt-4">
-                    {uploadedImages.map((url, index) => (
-                      <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                        <img src={url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => setUploadedImages(prev => prev.filter(i => i !== url))}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Videos */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Videos</label>
-                  <div className="flex gap-4">
-                    <Input
-                      type="file"
-                      accept="video/*"
-                      onChange={(e) => handleMediaUpload(e, "video")}
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      disabled={uploadMediaMutation.isPending}
-                    >
-                      {uploadMediaMutation.isPending ? "Uploading..." : "Upload Video"}
-                    </Button>
-                  </div>
-                  {/* Preview uploaded videos */}
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    {uploadedVideos.map((url, index) => (
-                      <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                        <video src={url} controls className="w-full h-full object-cover" />
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => setUploadedVideos(prev => prev.filter(i => i !== url))}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Screenshots */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Screenshots</label>
-                  <div className="flex gap-4">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => {
-                        Array.from(e.target.files || []).forEach(file => {
-                          const formData = new FormData();
-                          formData.append("file", file);
-                          formData.append("type", "screenshot");
-                          formData.append("category", "project");
-                          uploadMediaMutation.mutate(formData);
-                        });
-                      }}
-                      className="flex-1"
-                    />
-                    <Button
-                      type="button"
-                      disabled={uploadMediaMutation.isPending}
-                    >
-                      {uploadMediaMutation.isPending ? "Uploading..." : "Upload Screenshots"}
-                    </Button>
-                  </div>
-                  {/* Preview uploaded screenshots */}
-                  <div className="grid grid-cols-4 gap-4 mt-4">
-                    {uploadedScreenshots.map((url, index) => (
-                      <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                        <img src={url} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => setUploadedScreenshots(prev => prev.filter(i => i !== url))}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={createProjectMutation.isPending}
-              className="w-full"
-            >
-              {createProjectMutation.isPending ? "Creating..." : "Create Project"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Project Manager</h1>
+        <Button onClick={() => setFormData({ isOpen: true })}>
+          <Plus className="w-4 h-4 mr-2" />
+          New Project
+        </Button>
+      </div>
 
       {/* Projects List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -352,6 +188,15 @@ export default function ProjectManager() {
         ) : (
           projects.map((project) => (
             <Card key={project.id}>
+              <div className="aspect-video relative overflow-hidden">
+                {project.imageUrls[0] && (
+                  <img 
+                    src={project.imageUrls[0]} 
+                    alt={project.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+              </div>
               <CardHeader>
                 <CardTitle>{project.title}</CardTitle>
               </CardHeader>
@@ -364,12 +209,18 @@ export default function ProjectManager() {
                     </span>
                   ))}
                 </div>
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" size="sm">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="w-4 h-4" />
+                    {project.reviews?.length || 0} Reviews
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setFormData({ project, isOpen: true })}
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
                     Edit
-                  </Button>
-                  <Button variant="destructive" size="sm">
-                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -378,63 +229,230 @@ export default function ProjectManager() {
         )}
       </div>
 
-      {/* Reviews Section */}
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Project Reviews</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {projects.map((project) => (
-              <Card key={project.id}>
-                <CardHeader>
-                  <CardTitle className="text-lg">{project.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Add Review Form */}
-                    <form
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        const form = e.currentTarget;
-                        const formData = new FormData(form);
+      {/* Project Form Dialog */}
+      <Dialog open={formData.isOpen} onOpenChange={handleDialogChange}>
+        <DialogContent className="max-w-4xl h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {formData.project ? `Edit ${formData.project.title}` : 'Create New Project'}
+            </DialogTitle>
+          </DialogHeader>
 
-                        try {
-                          const response = await fetch(`/api/projects/${project.id}/reviews`, {
-                            method: "POST",
-                            headers: {
-                              'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                              customerName: formData.get("customerName") as string,
-                              customerCompany: formData.get("customerCompany") as string || null,
-                              customerAvatar: formData.get("customerAvatar") as string || null,
-                              rating: parseInt(formData.get("rating") as string),
-                              review: formData.get("review") as string,
-                            }),
-                          });
+          <Tabs defaultValue="details" className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="details">Project Details</TabsTrigger>
+              <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            </TabsList>
 
-                          if (!response.ok) {
-                            throw new Error("Failed to add review");
-                          }
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <TabsContent value="details">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Project Title</label>
+                    <Input 
+                      name="title" 
+                      required 
+                      defaultValue={formData.project?.title}
+                      placeholder="Enter project title" 
+                    />
+                  </div>
 
-                          queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-                          form.reset();
-                          toast({
-                            title: "Success",
-                            description: "Review added successfully",
-                          });
-                        } catch (error) {
-                          toast({
-                            title: "Error",
-                            description: error instanceof Error ? error.message : "Failed to add review",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      className="space-y-4"
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Category</label>
+                    <Select 
+                      value={selectedCategory} 
+                      onValueChange={setSelectedCategory}
                     >
-                      <input type="hidden" name="projectId" value={project.id} />
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map(cat => (
+                          <SelectItem key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Short Description</label>
+                    <Input 
+                      name="description" 
+                      required 
+                      defaultValue={formData.project?.description}
+                      placeholder="Brief project description" 
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Tech Stack</label>
+                    <Input 
+                      name="techStack" 
+                      required 
+                      defaultValue={formData.project?.techStack.join(", ")}
+                      placeholder="React, Node.js, PostgreSQL (comma-separated)" 
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Demo URL</label>
+                    <Input 
+                      name="demoUrl" 
+                      defaultValue={formData.project?.demoUrl || ""}
+                      placeholder="https://demo.example.com" 
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">GitHub URL</label>
+                    <Input 
+                      name="githubUrl" 
+                      defaultValue={formData.project?.githubUrl || ""}
+                      placeholder="https://github.com/example/project" 
+                    />
+                  </div>
+
+                  <div className="col-span-2 space-y-2">
+                    <label className="text-sm font-medium">Long Description</label>
+                    <Textarea
+                      name="longDescription"
+                      defaultValue={formData.project?.longDescription || ""}
+                      placeholder="Detailed project description with features and technical details"
+                      className="min-h-[200px]"
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="media">
+                <div className="space-y-6">
+                  {/* Main Images */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Main Images</label>
+                    <div className="flex gap-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleMediaUpload(e, "image")}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        disabled={uploadMediaMutation.isPending}
+                      >
+                        {uploadMediaMutation.isPending ? "Uploading..." : "Upload Image"}
+                      </Button>
+                    </div>
+                    {/* Preview grid for uploaded and existing images */}
+                    <div className="grid grid-cols-4 gap-4 mt-4">
+                      {[...uploadedImages, ...(formData.project?.imageUrls || [])].map((url, index) => (
+                        <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                          <img src={url} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-2 right-2"
+                            onClick={() => setUploadedImages(prev => prev.filter(i => i !== url))}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Videos */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Videos</label>
+                    <div className="flex gap-4">
+                      <Input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleMediaUpload(e, "video")}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        disabled={uploadMediaMutation.isPending}
+                      >
+                        {uploadMediaMutation.isPending ? "Uploading..." : "Upload Video"}
+                      </Button>
+                    </div>
+                    {/* Preview grid for uploaded and existing videos */}
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      {[...uploadedVideos, ...(formData.project?.videoUrls || [])].map((url, index) => (
+                        <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                          <video src={url} controls className="w-full h-full object-cover" />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-2 right-2"
+                            onClick={() => setUploadedVideos(prev => prev.filter(i => i !== url))}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Screenshots */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Screenshots</label>
+                    <div className="flex gap-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => {
+                          Array.from(e.target.files || []).forEach(file => {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            formData.append("type", "screenshot");
+                            formData.append("category", "project");
+                            uploadMediaMutation.mutate(formData);
+                          });
+                        }}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        disabled={uploadMediaMutation.isPending}
+                      >
+                        {uploadMediaMutation.isPending ? "Uploading..." : "Upload Screenshots"}
+                      </Button>
+                    </div>
+                    {/* Preview grid for uploaded and existing screenshots */}
+                    <div className="grid grid-cols-4 gap-4 mt-4">
+                      {[...uploadedScreenshots, ...(formData.project?.screenshots || [])].map((url, index) => (
+                        <div key={url} className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                          <img src={url} alt={`Screenshot ${index + 1}`} className="w-full h-full object-cover" />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-2 right-2"
+                            onClick={() => setUploadedScreenshots(prev => prev.filter(i => i !== url))}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="reviews">
+                <div className="space-y-6">
+                  {/* Add Review Form */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Add Review</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Customer Name</label>
@@ -445,11 +463,11 @@ export default function ProjectManager() {
                           <Input name="customerCompany" />
                         </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-4">
                         <label className="text-sm font-medium">Avatar URL</label>
                         <Input name="customerAvatar" type="url" placeholder="https://example.com/avatar.jpg" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-4">
                         <label className="text-sm font-medium">Rating (1-5)</label>
                         <Select name="rating" defaultValue="5">
                           <SelectTrigger>
@@ -464,51 +482,72 @@ export default function ProjectManager() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 mt-4">
                         <label className="text-sm font-medium">Review</label>
                         <Textarea name="review" required />
                       </div>
-                      <Button type="submit">Add Review</Button>
-                    </form>
+                    </CardContent>
+                  </Card>
 
-                    {/* Existing Reviews */}
-                    <div className="mt-6">
-                      <h4 className="text-sm font-medium mb-4">Existing Reviews</h4>
-                      <div className="space-y-4">
-                        {project.reviews?.map((review) => (
-                          <div key={review.id} className="p-4 rounded-lg bg-primary/5">
-                            <div className="flex items-center gap-3 mb-2">
-                              {review.customerAvatar && (
-                                <img
-                                  src={review.customerAvatar}
-                                  alt={review.customerName}
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              )}
-                              <div>
-                                <p className="font-medium">{review.customerName}</p>
-                                {review.customerCompany && (
-                                  <p className="text-sm text-muted-foreground">{review.customerCompany}</p>
+                  {/* Existing Reviews */}
+                  {formData.project?.reviews && formData.project.reviews.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Existing Reviews</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {formData.project.reviews.map((review) => (
+                            <div key={review.id} className="p-4 rounded-lg bg-primary/5">
+                              <div className="flex items-center gap-3 mb-2">
+                                {review.customerAvatar && (
+                                  <img
+                                    src={review.customerAvatar}
+                                    alt={review.customerName}
+                                    className="w-10 h-10 rounded-full"
+                                  />
                                 )}
+                                <div>
+                                  <p className="font-medium">{review.customerName}</p>
+                                  {review.customerCompany && (
+                                    <p className="text-sm text-muted-foreground">{review.customerCompany}</p>
+                                  )}
+                                </div>
+                                <div className="ml-auto flex items-center">
+                                  {[...Array(review.rating)].map((_, i) => (
+                                    <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                                  ))}
+                                </div>
                               </div>
-                              <div className="ml-auto flex items-center">
-                                {[...Array(review.rating)].map((_, i) => (
-                                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                                ))}
-                              </div>
+                              <p className="text-sm text-muted-foreground">{review.review}</p>
                             </div>
-                            <p className="text-sm text-muted-foreground">{review.review}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </TabsContent>
+
+              <div className="flex justify-end gap-4 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleDialogChange(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createProjectMutation.isPending}
+                >
+                  {createProjectMutation.isPending ? "Saving..." : "Save Project"}
+                </Button>
+              </div>
+            </form>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
