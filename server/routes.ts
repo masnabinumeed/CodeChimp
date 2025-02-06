@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import express from 'express';
 import { storage } from "./storage";
-import { insertContactSchema, insertProjectSchema, insertMediaAssetSchema } from "@shared/schema";
+import { insertContactSchema, insertMediaAssetSchema } from "@shared/schema";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -28,27 +28,87 @@ const upload = multer({
   }
 });
 
-// In-memory storage for uploaded files
-let mediaAssets = [
-  {
-    id: 1,
-    name: "Company Logo",
-    type: "logo",
-    url: "https://example.com/logo.png",
-    category: "brand",
-    createdAt: new Date()
-  },
-  {
-    id: 2,
-    name: "Homepage Video",
-    type: "video",
-    url: "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4",
-    category: "home",
-    createdAt: new Date()
-  }
-];
+export function registerRoutes(app: Express): Server {
+  // Projects API
+  app.get("/api/projects", (_req, res) => {
+    const projectsWithReviews = mockProjects.map(project => ({
+      ...project,
+      reviews: mockReviews.filter(review => review.projectId === project.id)
+    }));
+    res.json(projectsWithReviews);
+  });
 
-let nextMediaId = 3;
+  app.get("/api/projects/:category", (req, res) => {
+    const { category } = req.params;
+    const filtered = mockProjects.filter(p => p.category === category);
+    const projectsWithReviews = filtered.map(project => ({
+      ...project,
+      reviews: mockReviews.filter(review => review.projectId === project.id)
+    }));
+    res.json(projectsWithReviews);
+  });
+
+  // Contact Form API
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const data = insertContactSchema.parse(req.body);
+      await storage.createContactMessage(data);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(400).json({ error: "Invalid form data" });
+    }
+  });
+
+  // Media Management API
+  app.get("/api/media", async (_req, res) => {
+    try {
+      const assets = await storage.getMediaAssets();
+      res.json(assets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch media assets" });
+    }
+  });
+
+  app.get("/api/media/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const assets = category === "all" 
+        ? await storage.getMediaAssets()
+        : await storage.getMediaAssetsByCategory(category);
+      res.json(assets);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch media assets" });
+    }
+  });
+
+  app.post("/api/media/upload", upload.single("file"), async (req, res) => {
+    try {
+      if (!req.file) {
+        throw new Error("No file uploaded");
+      }
+
+      const fileUrl = `/uploads/${req.file.filename}`;
+      const mediaData = {
+        name: req.file.originalname,
+        type: req.body.type,
+        url: fileUrl,
+        category: req.body.category,
+        projectId: req.body.projectId ? parseInt(req.body.projectId) : undefined
+      };
+
+      const parsedData = insertMediaAssetSchema.parse(mediaData);
+      const newAsset = await storage.createMediaAsset(parsedData);
+      res.json({ success: true, file: newAsset });
+    } catch (error) {
+      res.status(400).json({ error: "Invalid upload data" });
+    }
+  });
+
+  // Serve uploaded files statically
+  app.use("/uploads", express.static("uploads"));
+
+  return createServer(app);
+}
 
 const mockReviews = [
   {
@@ -191,78 +251,3 @@ const mockProjects = [
     createdAt: new Date()
   }
 ];
-
-export function registerRoutes(app: Express): Server {
-  // Projects API
-  app.get("/api/projects", (_req, res) => {
-    const projectsWithReviews = mockProjects.map(project => ({
-      ...project,
-      reviews: mockReviews.filter(review => review.projectId === project.id)
-    }));
-    res.json(projectsWithReviews);
-  });
-
-  app.get("/api/projects/:category", (req, res) => {
-    const { category } = req.params;
-    const filtered = mockProjects.filter(p => p.category === category);
-    const projectsWithReviews = filtered.map(project => ({
-      ...project,
-      reviews: mockReviews.filter(review => review.projectId === project.id)
-    }));
-    res.json(projectsWithReviews);
-  });
-
-  // Contact Form API
-  app.post("/api/contact", async (req, res) => {
-    try {
-      const data = insertContactSchema.parse(req.body);
-      await storage.createContactMessage(data);
-      res.json({ success: true });
-    } catch (error) {
-      res.status(400).json({ error: "Invalid form data" });
-    }
-  });
-
-  // Media Management API
-  app.get("/api/media", (_req, res) => {
-    res.json(mediaAssets);
-  });
-
-  app.get("/api/media/:category", (req, res) => {
-    const { category } = req.params;
-    const filtered = category === "all" 
-      ? mediaAssets 
-      : mediaAssets.filter(m => m.category === category);
-    res.json(filtered);
-  });
-
-  app.post("/api/media/upload", upload.single("file"), async (req, res) => {
-    try {
-      if (!req.file) {
-        throw new Error("No file uploaded");
-      }
-
-      const fileUrl = `/uploads/${req.file.filename}`;
-      const mediaData = {
-        id: nextMediaId++,
-        name: req.file.originalname,
-        type: req.body.type,
-        url: fileUrl,
-        category: req.body.category,
-        projectId: req.body.projectId ? parseInt(req.body.projectId) : undefined,
-        createdAt: new Date()
-      };
-
-      const parsedData = insertMediaAssetSchema.parse(mediaData);
-      mediaAssets.push(mediaData);
-      res.json({ success: true, file: parsedData });
-    } catch (error) {
-      res.status(400).json({ error: "Invalid upload data" });
-    }
-  });
-
-  // Serve uploaded files statically
-  app.use("/uploads", express.static("uploads"));
-
-  return createServer(app);
-}
