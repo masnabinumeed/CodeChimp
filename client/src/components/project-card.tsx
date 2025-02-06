@@ -103,7 +103,9 @@ export function ProjectCard({ project, reviews = [] }: ProjectCardProps) {
                   className="group/btn hover:border-primary hover:text-primary transition-colors duration-300"
                   onClick={(e) => {
                     e.stopPropagation();
-                    window.open(project.demoUrl, '_blank');
+                    if (project.demoUrl) {
+                      window.open(project.demoUrl, '_blank');
+                    }
                   }}
                 >
                   <ExternalLink className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
@@ -117,7 +119,9 @@ export function ProjectCard({ project, reviews = [] }: ProjectCardProps) {
                   className="group/btn hover:border-primary hover:text-primary transition-colors duration-300"
                   onClick={(e) => {
                     e.stopPropagation();
-                    window.open(project.githubUrl, '_blank');
+                    if (project.githubUrl) {
+                      window.open(project.githubUrl, '_blank');
+                    }
                   }}
                 >
                   <Github className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
