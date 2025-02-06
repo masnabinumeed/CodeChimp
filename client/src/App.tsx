@@ -8,6 +8,7 @@ import Projects from "@/pages/projects";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 import MediaManager from "@/pages/admin/media";
+import ProjectManager from "@/pages/admin/projects";
 
 function Router() {
   return (
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/projects" component={Projects} />
       <Route path="/contact" component={Contact} />
       <Route path="/admin/media" component={MediaManager} />
+      <Route path="/admin/projects" component={ProjectManager} />
       <Route component={NotFound} />
     </Switch>
   );
