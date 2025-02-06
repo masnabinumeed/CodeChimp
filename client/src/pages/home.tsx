@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Monitor, Smartphone, Globe, Brain, Cloud, ChevronRight, Bitcoin } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { SiReact, SiTypescript, SiTailwindcss, SiNodedotjs, SiPostgresql, SiDocker } from "react-icons/si";
 
 const services = [
   {
@@ -144,14 +145,33 @@ export default function Home() {
                   <div className="w-full h-full mx-auto rotate-12 rounded-3xl bg-gradient-to-r from-primary to-purple-600 opacity-30 blur-3xl" />
                 </div>
                 <div className="relative">
-                  <div className="aspect-square rounded-2xl bg-gray-900 p-8 ring-1 ring-gray-800">
-                    <div className="flex flex-col h-full space-y-6">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="h-4 rounded-full bg-gray-800 animate-pulse" style={{
-                          width: `${85 - i * 15}%`,
-                          animationDelay: `${i * 200}ms`
-                        }} />
-                      ))}
+                  <div className="aspect-square rounded-2xl bg-gray-900/50 backdrop-blur-sm p-8 ring-1 ring-gray-800">
+                    <div className="flex flex-col h-full justify-between">
+                      <div className="grid grid-cols-2 gap-6">
+                        {[
+                          { icon: SiReact, name: "React" },
+                          { icon: SiTypescript, name: "TypeScript" },
+                          { icon: SiTailwindcss, name: "Tailwind" },
+                          { icon: SiNodedotjs, name: "Node.js" },
+                          { icon: SiPostgresql, name: "PostgreSQL" },
+                          { icon: SiDocker, name: "Docker" }
+                        ].map(({ icon: Icon, name }, index) => (
+                          <div
+                            key={name}
+                            className="flex flex-col items-center gap-2 p-4 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors group"
+                          >
+                            <Icon className="w-8 h-8 text-gray-400 group-hover:text-primary transition-colors" />
+                            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">
+                              {name}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-400">
+                          Built with modern technologies
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
