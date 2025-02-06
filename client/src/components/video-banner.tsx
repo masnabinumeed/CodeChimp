@@ -2,8 +2,17 @@ import { cn } from "@/lib/utils";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { ArrowRight, Bot } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { MediaAsset } from "@shared/schema";
 
 export function VideoBanner() {
+  const { data: homeMedia = [] } = useQuery<MediaAsset[]>({
+    queryKey: ["/api/media/home"]
+  });
+
+  const videoAsset = homeMedia.find(asset => asset.type === "video");
+  const botIconAsset = homeMedia.find(asset => asset.type === "logo");
+
   const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const servicesSection = document.getElementById('services');
@@ -23,7 +32,7 @@ export function VideoBanner() {
         poster="https://images.unsplash.com/photo-1531297484001-80022131f5a1"
       >
         <source 
-          src="https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4" 
+          src={videoAsset?.url || "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4"} 
           type="video/mp4" 
         />
       </video>
@@ -39,7 +48,15 @@ export function VideoBanner() {
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
             <span className="flex items-center gap-4">
-              <Bot className="w-12 h-12 text-primary animate-bounce" />
+              {botIconAsset ? (
+                <img 
+                  src={botIconAsset.url} 
+                  alt="Tech Monkeys Logo" 
+                  className="w-12 h-12 animate-bounce"
+                />
+              ) : (
+                <Bot className="w-12 h-12 text-primary animate-bounce" />
+              )}
               <span>
                 <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
                   Tech Monkeys
