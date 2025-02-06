@@ -99,20 +99,6 @@ export function VideoBanner() {
         </div>
 
         <TeamSection />
-
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2">
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            className="w-6 h-10 rounded-full border-2 border-white/20 p-1"
-          >
-            <motion.div
-              animate={{ y: [0, 12, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-1 h-2 bg-white/60 rounded-full mx-auto"
-            />
-          </motion.div>
-        </div>
       </div>
     </div>
   );
