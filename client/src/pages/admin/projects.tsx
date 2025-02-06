@@ -17,8 +17,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, Trash2 } from "lucide-react";
-import type { Project, InsertProject } from "@shared/schema";
+import { Upload, Trash2, Star } from "lucide-react";
+import type { Project, InsertProject, ProjectReview } from "@shared/schema"; // Added import for ProjectReview
 import { queryClient } from "@/lib/queryClient";
 
 const categories = [
@@ -34,7 +34,8 @@ export default function ProjectManager() {
   const [uploadedScreenshots, setUploadedScreenshots] = useState<string[]>([]);
   const { toast } = useToast();
 
-  const { data: projects = [], isLoading } = useQuery<Project[]>({
+  // Update the query to include project reviews
+  const { data: projects = [], isLoading } = useQuery<(Project & { reviews: ProjectReview[] })[]>({
     queryKey: ["/api/projects"]
   });
 
@@ -76,13 +77,13 @@ export default function ProjectManager() {
   });
 
   const createProjectMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
+    mutationFn: async (projectData: InsertProject) => {
       const response = await fetch("/api/projects", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(Object.fromEntries(formData)),
+        body: JSON.stringify(projectData),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -133,19 +134,19 @@ export default function ProjectManager() {
 
     // Create the project data
     const projectData = {
-      title: formData.get("title"),
-      description: formData.get("description"),
-      longDescription: formData.get("longDescription"),
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      longDescription: formData.get("longDescription") as string,
       category: selectedCategory,
       techStack,
       imageUrls: uploadedImages,
       videoUrls: uploadedVideos,
       screenshots: uploadedScreenshots,
-      demoUrl: formData.get("demoUrl") || null,
-      githubUrl: formData.get("githubUrl") || null,
+      demoUrl: formData.get("demoUrl") as string || null,
+      githubUrl: formData.get("githubUrl") as string || null,
     };
 
-    createProjectMutation.mutate(projectData); // Mutate with projectData instead of formData
+    createProjectMutation.mutate(projectData);
   };
 
   return (
@@ -203,8 +204,8 @@ export default function ProjectManager() {
 
               <div className="col-span-2 space-y-2">
                 <label className="text-sm font-medium">Long Description</label>
-                <Textarea 
-                  name="longDescription" 
+                <Textarea
+                  name="longDescription"
                   placeholder="Detailed project description with features and technical details"
                   className="min-h-[200px]"
                 />
@@ -224,7 +225,7 @@ export default function ProjectManager() {
                       onChange={(e) => handleMediaUpload(e, "image")}
                       className="flex-1"
                     />
-                    <Button 
+                    <Button
                       type="button"
                       disabled={uploadMediaMutation.isPending}
                       onClick={() => document.querySelector<HTMLInputElement>('input[type="file"]')?.click()}
@@ -260,7 +261,7 @@ export default function ProjectManager() {
                       onChange={(e) => handleMediaUpload(e, "video")}
                       className="flex-1"
                     />
-                    <Button 
+                    <Button
                       type="button"
                       disabled={uploadMediaMutation.isPending}
                     >
@@ -304,7 +305,7 @@ export default function ProjectManager() {
                       }}
                       className="flex-1"
                     />
-                    <Button 
+                    <Button
                       type="button"
                       disabled={uploadMediaMutation.isPending}
                     >
@@ -331,8 +332,8 @@ export default function ProjectManager() {
               </div>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={createProjectMutation.isPending}
               className="w-full"
             >
@@ -376,6 +377,138 @@ export default function ProjectManager() {
           ))
         )}
       </div>
+
+      {/* Reviews Section */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Project Reviews</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {projects.map((project) => (
+              <Card key={project.id}>
+                <CardHeader>
+                  <CardTitle className="text-lg">{project.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Add Review Form */}
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const form = e.currentTarget;
+                        const formData = new FormData(form);
+
+                        try {
+                          const response = await fetch(`/api/projects/${project.id}/reviews`, {
+                            method: "POST",
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              customerName: formData.get("customerName") as string,
+                              customerCompany: formData.get("customerCompany") as string || null,
+                              customerAvatar: formData.get("customerAvatar") as string || null,
+                              rating: parseInt(formData.get("rating") as string),
+                              review: formData.get("review") as string,
+                            }),
+                          });
+
+                          if (!response.ok) {
+                            throw new Error("Failed to add review");
+                          }
+
+                          queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+                          form.reset();
+                          toast({
+                            title: "Success",
+                            description: "Review added successfully",
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: error instanceof Error ? error.message : "Failed to add review",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      className="space-y-4"
+                    >
+                      <input type="hidden" name="projectId" value={project.id} />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Customer Name</label>
+                          <Input name="customerName" required />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Company</label>
+                          <Input name="customerCompany" />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Avatar URL</label>
+                        <Input name="customerAvatar" type="url" placeholder="https://example.com/avatar.jpg" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Rating (1-5)</label>
+                        <Select name="rating" defaultValue="5">
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select rating" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map((rating) => (
+                              <SelectItem key={rating} value={rating.toString()}>
+                                {rating} Star{rating !== 1 ? 's' : ''}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Review</label>
+                        <Textarea name="review" required />
+                      </div>
+                      <Button type="submit">Add Review</Button>
+                    </form>
+
+                    {/* Existing Reviews */}
+                    <div className="mt-6">
+                      <h4 className="text-sm font-medium mb-4">Existing Reviews</h4>
+                      <div className="space-y-4">
+                        {project.reviews?.map((review) => (
+                          <div key={review.id} className="p-4 rounded-lg bg-primary/5">
+                            <div className="flex items-center gap-3 mb-2">
+                              {review.customerAvatar && (
+                                <img
+                                  src={review.customerAvatar}
+                                  alt={review.customerName}
+                                  className="w-10 h-10 rounded-full"
+                                />
+                              )}
+                              <div>
+                                <p className="font-medium">{review.customerName}</p>
+                                {review.customerCompany && (
+                                  <p className="text-sm text-muted-foreground">{review.customerCompany}</p>
+                                )}
+                              </div>
+                              <div className="ml-auto flex items-center">
+                                {[...Array(review.rating)].map((_, i) => (
+                                  <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{review.review}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
