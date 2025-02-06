@@ -12,8 +12,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { Upload } from "lucide-react";
 import type { MediaAsset } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 
 const categories = [
   { value: "all", label: "All Media" },
@@ -51,6 +52,7 @@ export default function MediaManager() {
       return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/media"] });
       toast({
         title: "Success",
         description: "Media uploaded successfully",
@@ -87,48 +89,73 @@ export default function MediaManager() {
       {/* Upload Section */}
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Upload New Media</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Upload className="h-5 w-5" />
+            Upload New Media
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-4">
-            <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                {types.map(type => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <CardContent>
+          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Media Type</label>
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {types.map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.slice(1).map(cat => (
-                  <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Category</label>
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.slice(1).map(cat => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*,video/*"
-              onChange={handleFileUpload}
-              className="flex-1"
-            />
-          </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">File</label>
+              <div className="flex gap-4">
+                <Input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileUpload}
+                  className="flex-1"
+                />
+                <Button 
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadMutation.isPending}
+                >
+                  {uploadMutation.isPending ? "Uploading..." : "Upload"}
+                </Button>
+              </div>
+            </div>
 
-          {uploadMutation.isPending && (
-            <div className="text-sm text-muted-foreground">Uploading...</div>
-          )}
+            {uploadMutation.isPending && (
+              <div className="text-sm text-muted-foreground">
+                Uploading your file...
+              </div>
+            )}
+          </form>
         </CardContent>
       </Card>
 
