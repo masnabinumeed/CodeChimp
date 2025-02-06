@@ -137,7 +137,8 @@ export default function ProjectManager() {
 
     const formData = new FormData();
     formData.append("file", files[0]);
-    formData.append("type", type);
+    // Change 'screenshot' type to 'image' as it's the only allowed type
+    formData.append("type", type === "screenshot" ? "image" : type);
     formData.append("category", "project");
 
     try {
@@ -154,8 +155,21 @@ export default function ProjectManager() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    const formEl = e.currentTarget;
+    const formData = new FormData(formEl);
+
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+
+    // Validate required fields
+    if (!title || !description) {
+      toast({
+        title: "Error",
+        description: "Title and description are required",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Convert tech stack string to array with proper null checking
     const techStackString = formData.get("techStack") as string | null;
@@ -167,8 +181,8 @@ export default function ProjectManager() {
     // Create the project data
     const projectData = {
       ...(existingProject?.id ? { id: existingProject.id } : {}),
-      title: formData.get("title") as string,
-      description: formData.get("description") as string,
+      title,
+      description,
       longDescription: formData.get("longDescription") as string || "",
       category: selectedCategory,
       techStack,
@@ -180,28 +194,7 @@ export default function ProjectManager() {
     };
 
     try {
-      const response = await fetch(
-        existingProject?.id ? `/api/projects/${existingProject.id}` : "/api/projects",
-        {
-          method: existingProject?.id ? "PATCH" : "POST",
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(projectData),
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || `Failed to ${existingProject?.id ? 'update' : 'create'} project`);
-      }
-
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      handleDialogChange(false);
-      toast({
-        title: "Success",
-        description: `Project ${existingProject?.id ? 'updated' : 'created'} successfully`,
-      });
+      createProjectMutation.mutate(projectData);
     } catch (error) {
       toast({
         title: "Error",
