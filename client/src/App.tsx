@@ -12,14 +12,16 @@ import ProjectManager from "@/pages/admin/projects";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/projects" component={Projects} />
-      <Route path="/contact" component={Contact} />
-      <Route path="/admin/media" component={MediaManager} />
-      <Route path="/admin/projects" component={ProjectManager} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="pt-16"> {/* Add padding-top equal to header height */}
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/projects" component={Projects} />
+        <Route path="/contact" component={Contact} />
+        <Route path="/admin/media" component={MediaManager} />
+        <Route path="/admin/projects" component={ProjectManager} />
+        <Route component={NotFound} />
+      </Switch>
+    </div>
   );
 }
 
