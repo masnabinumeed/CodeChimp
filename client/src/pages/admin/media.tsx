@@ -12,14 +12,13 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Upload } from "lucide-react";
+import { Upload, Bot, Video, Image } from "lucide-react";
 import type { MediaAsset } from "@shared/schema";
 import { queryClient } from "@/lib/queryClient";
 
 const categories = [
-  { value: "all", label: "All Media" },
-  { value: "project", label: "Project Media" },
   { value: "home", label: "Home Page" },
+  { value: "project", label: "Projects" },
   { value: "brand", label: "Brand Assets" }
 ];
 
@@ -30,15 +29,19 @@ const types = [
 ];
 
 export default function MediaManager() {
-  const [category, setCategory] = useState("all");
+  const [activeTab, setActiveTab] = useState("home");
   const [selectedType, setSelectedType] = useState("image");
-  const [selectedCategory, setSelectedCategory] = useState("project");
+  const [selectedCategory, setSelectedCategory] = useState("home");
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: assets = [], isLoading } = useQuery<MediaAsset[]>({
-    queryKey: [category === "all" ? "/api/media" : `/api/media/${category}`]
+    queryKey: [`/api/media/${activeTab}`]
   });
+
+  // Get current home page media
+  const homeVideo = assets.find(asset => asset.type === "video" && asset.category === "home");
+  const botIcon = assets.find(asset => asset.type === "logo" && asset.category === "home");
 
   const uploadMutation = useMutation({
     mutationFn: async (formData: FormData) => {
@@ -86,81 +89,7 @@ export default function MediaManager() {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Media Manager</h1>
 
-      {/* Upload Section */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Upload New Media
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Media Type</label>
-                <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {types.map(type => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium mb-2 block">Category</label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.slice(1).map(cat => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">File</label>
-              <div className="flex gap-4">
-                <Input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileUpload}
-                  className="flex-1"
-                />
-                <Button 
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadMutation.isPending}
-                >
-                  {uploadMutation.isPending ? "Uploading..." : "Upload"}
-                </Button>
-              </div>
-            </div>
-
-            {uploadMutation.isPending && (
-              <div className="text-sm text-muted-foreground">
-                Uploading your file...
-              </div>
-            )}
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Media Browser */}
-      <Tabs value={category} onValueChange={setCategory} className="mb-8">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
         <TabsList>
           {categories.map((cat) => (
             <TabsTrigger key={cat.value} value={cat.value}>
@@ -170,46 +99,209 @@ export default function MediaManager() {
         </TabsList>
       </Tabs>
 
-      {/* Media Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="aspect-video rounded-lg bg-gray-100 animate-pulse" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {assets.map((asset) => (
-            <Card key={asset.id} className="overflow-hidden">
-              <div className="aspect-video relative">
-                {asset.type === "video" ? (
-                  <video
-                    src={asset.url}
-                    controls
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  <img
-                    src={asset.url}
-                    alt={asset.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                )}
-              </div>
-              <CardContent className="p-4">
-                <p className="font-medium truncate">{asset.name}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm text-muted-foreground capitalize">
-                    {asset.type}
-                  </span>
-                  <span className="text-sm text-muted-foreground capitalize">
-                    {asset.category}
-                  </span>
+      {activeTab === "home" && (
+        <div className="space-y-6">
+          {/* Bot Icon Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                Bot Icon
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+                  {botIcon ? (
+                    <img src={botIcon.url} alt="Bot Icon" className="w-full h-full object-cover" />
+                  ) : (
+                    <Bot className="w-full h-full p-4 text-gray-400" />
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <div className="flex-1">
+                  <div className="flex gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        setSelectedType("logo");
+                        setSelectedCategory("home");
+                        handleFileUpload(e);
+                      }}
+                      className="flex-1"
+                    />
+                    <Button 
+                      onClick={() => {
+                        setSelectedType("logo");
+                        setSelectedCategory("home");
+                        fileInputRef.current?.click();
+                      }}
+                      disabled={uploadMutation.isPending}
+                    >
+                      {uploadMutation.isPending ? "Uploading..." : "Change Icon"}
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Recommended size: 128x128px. PNG or SVG format preferred.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Video Banner Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Video className="h-5 w-5" />
+                Video Banner
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                  {homeVideo ? (
+                    <video
+                      src={homeVideo.url}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Video className="w-16 h-16 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-4">
+                  <Input
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => {
+                      setSelectedType("video");
+                      setSelectedCategory("home");
+                      handleFileUpload(e);
+                    }}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={() => {
+                      setSelectedType("video");
+                      setSelectedCategory("home");
+                      fileInputRef.current?.click();
+                    }}
+                    disabled={uploadMutation.isPending}
+                  >
+                    {uploadMutation.isPending ? "Uploading..." : "Change Video"}
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Recommended format: MP4. Max file size: 10MB.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+      )}
+
+      {/* Media Grid for other categories */}
+      {activeTab !== "home" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {isLoading ? (
+            [1, 2, 3].map((n) => (
+              <div key={n} className="aspect-video rounded-lg bg-gray-100 animate-pulse" />
+            ))
+          ) : (
+            assets.map((asset) => (
+              <Card key={asset.id} className="overflow-hidden">
+                <div className="aspect-video relative">
+                  {asset.type === "video" ? (
+                    <video
+                      src={asset.url}
+                      controls
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={asset.url}
+                      alt={asset.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <CardContent className="p-4">
+                  <p className="font-medium truncate">{asset.name}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm text-muted-foreground capitalize">
+                      {asset.type}
+                    </span>
+                    <span className="text-sm text-muted-foreground capitalize">
+                      {asset.category}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Upload Section for non-home categories */}
+      {activeTab !== "home" && (
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              Upload New Media
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Media Type</label>
+                  <Select value={selectedType} onValueChange={setSelectedType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {types.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-2 block">File</label>
+                <div className="flex gap-4">
+                  <Input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleFileUpload}
+                    className="flex-1"
+                  />
+                  <Button 
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadMutation.isPending}
+                  >
+                    {uploadMutation.isPending ? "Uploading..." : "Upload"}
+                  </Button>
+                </div>
+              </div>
+
+              {uploadMutation.isPending && (
+                <div className="text-sm text-muted-foreground">
+                  Uploading your file...
+                </div>
+              )}
+            </form>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
