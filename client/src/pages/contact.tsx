@@ -25,8 +25,8 @@ export default function Contact() {
     defaultValues: {
       name: "",
       email: "",
-      message: ""
-    }
+      message: "",
+    },
   });
 
   const mutation = useMutation({
@@ -36,7 +36,7 @@ export default function Contact() {
     onSuccess: () => {
       toast({
         title: "Message Sent",
-        description: "We'll get back to you soon!"
+        description: "We'll get back to you soon!",
       });
       form.reset();
     },
@@ -44,9 +44,9 @@ export default function Contact() {
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   return (
@@ -61,7 +61,10 @@ export default function Contact() {
             </CardHeader>
             <CardContent>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit((data) => mutation.mutate(data))}
+                  className="space-y-6"
+                >
                   <FormField
                     control={form.control}
                     name="name"
@@ -83,7 +86,11 @@ export default function Contact() {
                       <FormItem>
                         <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="your@email.com" {...field} />
+                          <Input
+                            type="email"
+                            placeholder="your@email.com"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -113,8 +120,14 @@ export default function Contact() {
           </Card>
 
           <div className="mt-12 flex justify-center gap-6">
-            <SocialLink href="https://wa.me/1234567890" icon={MessageCircle} />
-            <SocialLink href="https://linkedin.com" icon={Linkedin} />
+            <SocialLink
+              href="https://wa.me/+923343095597"
+              icon={MessageCircle}
+            />
+            <SocialLink
+              href="https://www.linkedin.com/company/techmonkeysio"
+              icon={Linkedin}
+            />
             <SocialLink href="https://twitter.com" icon={Twitter} />
           </div>
         </div>
@@ -123,12 +136,18 @@ export default function Contact() {
   );
 }
 
-function SocialLink({ href, icon: Icon }: { href: string; icon: React.ComponentType<any> }) {
+function SocialLink({
+  href,
+  icon: Icon,
+}: {
+  href: string;
+  icon: React.ComponentType<any>;
+}) {
   return (
-    <a 
+    <a
       href={href}
       target="_blank"
-      rel="noopener noreferrer" 
+      rel="noopener noreferrer"
       className="p-2 rounded-full hover:bg-gray-100 transition-colors"
     >
       <Icon className="h-6 w-6 text-muted-foreground" />
