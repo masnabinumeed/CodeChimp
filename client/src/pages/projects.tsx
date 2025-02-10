@@ -10,24 +10,54 @@ const sampleProjects = [
     longDescription: "A comprehensive e-commerce solution with features like product management, cart functionality, user authentication, and payment integration.",
     category: "web",
     imageUrls: ["https://images.unsplash.com/photo-1557821552-17105176677c"],
-    screenshots: [
-      "https://images.unsplash.com/photo-1557821552-17105176677c",
-      "https://images.unsplash.com/photo-1557821552-17105176677c"
-    ],
+    screenshots: ["https://images.unsplash.com/photo-1557821552-17105176677c"],
     videoUrls: [],
     techStack: ["React", "Node.js", "PostgreSQL", "Stripe", "Docker"],
     demoUrl: "https://demo.example.com",
     githubUrl: "https://github.com/example/project",
-    reviews: [
-      {
-        id: 1,
-        projectId: 1,
-        name: "John Doe",
-        rating: 5,
-        comment: "Excellent platform with great features",
-        date: new Date().toISOString()
-      }
-    ]
+    reviews: [{ id: 1, projectId: 1, name: "John Doe", rating: 5, comment: "Excellent platform", date: new Date().toISOString() }]
+  },
+  {
+    id: 2,
+    title: "Fitness Tracking App",
+    description: "Cross-platform mobile app for tracking workouts and nutrition",
+    longDescription: "A comprehensive fitness tracking solution with workout plans, nutrition logging, and progress analytics.",
+    category: "mobile",
+    imageUrls: ["https://images.unsplash.com/photo-1526506118085-60ce8714f8c5"],
+    screenshots: ["https://images.unsplash.com/photo-1526506118085-60ce8714f8c5"],
+    videoUrls: [],
+    techStack: ["React Native", "Firebase", "Redux", "TypeScript"],
+    demoUrl: "https://demo.example.com/fitness",
+    githubUrl: "https://github.com/example/fitness",
+    reviews: [{ id: 2, projectId: 2, name: "Jane Smith", rating: 4, comment: "Great mobile app", date: new Date().toISOString() }]
+  },
+  {
+    id: 3,
+    title: "Code Editor IDE",
+    description: "Professional desktop IDE for developers with advanced features",
+    longDescription: "A powerful code editor with syntax highlighting, debugging tools, and git integration.",
+    category: "desktop",
+    imageUrls: ["https://images.unsplash.com/photo-1461749280684-dccba630e2f6"],
+    screenshots: ["https://images.unsplash.com/photo-1461749280684-dccba630e2f6"],
+    videoUrls: [],
+    techStack: ["Electron", "TypeScript", "Monaco Editor", "Node.js"],
+    demoUrl: "https://demo.example.com/editor",
+    githubUrl: "https://github.com/example/editor",
+    reviews: [{ id: 3, projectId: 3, name: "Mike Johnson", rating: 5, comment: "Powerful IDE", date: new Date().toISOString() }]
+  },
+  {
+    id: 4,
+    title: "NFT Marketplace",
+    description: "Decentralized marketplace for trading digital collectibles",
+    longDescription: "A Web3 platform for minting, buying, and selling NFTs with wallet integration.",
+    category: "web3",
+    imageUrls: ["https://images.unsplash.com/photo-1644658722893-2f1564623412"],
+    screenshots: ["https://images.unsplash.com/photo-1644658722893-2f1564623412"],
+    videoUrls: [],
+    techStack: ["Solidity", "React", "Web3.js", "IPFS"],
+    demoUrl: "https://demo.example.com/nft",
+    githubUrl: "https://github.com/example/nft",
+    reviews: [{ id: 4, projectId: 4, name: "Alex Chen", rating: 5, comment: "Amazing NFT platform", date: new Date().toISOString() }]
   }
 ];
 
@@ -35,7 +65,8 @@ const categories = [
   { value: "all", label: "All Projects" },
   { value: "web", label: "Web" },
   { value: "mobile", label: "Mobile" },
-  { value: "desktop", label: "Desktop" }
+  { value: "desktop", label: "Desktop" },
+  { value: "web3", label: "Web3" }
 ];
 
 export default function Projects() {
