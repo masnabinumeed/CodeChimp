@@ -88,14 +88,14 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
           </div>
 
           {/* Thumbnails */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto p-2">
             {allMedia.map((media, index) => (
               <button
                 key={media}
                 onClick={() => setCurrentMediaIndex(index)}
                 className={cn(
-                  "relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden",
-                  currentMediaIndex === index && "ring-2 ring-primary"
+                  "relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border border-border",
+                  currentMediaIndex === index && "ring-2 ring-primary ring-offset-2 ring-offset-background"
                 )}
               >
                 {isVideo(media) ? (
