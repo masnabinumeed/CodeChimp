@@ -53,7 +53,15 @@ export function VideoBanner() {
           >
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
               <span className="flex items-center gap-4">
-                <Bot className="w-12 h-12 text-primary animate-bounce" />
+                {botIconAsset ? (
+                  <img
+                    src="/uploads/TechMonkeys.png"
+                    alt="Tech Monkeys Logo"
+                    className="w-12 h-16"
+                  />
+                ) : (
+                  <Bot className="w-12 h-12 text-primary animate-bounce" />
+                )}
                 <span>
                   <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
                     Tech Monkeys
