@@ -154,7 +154,7 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
                         />
                       )}
                       <div>
-                        <p className="font-medium">{review.customerName}</p>
+                        <p className="font-medium">{review.name}</p>
                         {review.customerCompany && (
                           <p className="text-sm text-muted-foreground">{review.customerCompany}</p>
                         )}
