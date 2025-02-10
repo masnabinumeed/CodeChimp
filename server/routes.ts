@@ -111,8 +111,8 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/contact", async (req, res) => {
     try {
       const data = insertContactSchema.parse(req.body);
-      import('nodemailer').then(async ({default: nodemailer}) => {
-        const transporter = nodemailer.createTransport({
+      const nodemailer = (await import('nodemailer')).default;
+      const transporter = nodemailer.createTransport({
         host: 'techmonkeys.io',
         port: 465,
         secure: true,
@@ -135,23 +135,19 @@ Message: ${data.message}
       });
 
       await transporter.sendMail({
-          from: 'muneeb@techmonkeys.io',
-          to: 'muneeb@techmonkeys.io',
-          subject: 'New Contact Form Submission',
-          text: `
+        from: 'muneeb@techmonkeys.io',
+        to: 'muneeb@techmonkeys.io',
+        subject: 'New Contact Form Submission',
+        text: `
 New contact form submission:
 Name: ${data.name}
 Email: ${data.email}
 Message: ${data.message}
-          `
-        });
-        
-        await storage.createContactMessage(data);
-        res.json({ success: true });
-      }).catch(error => {
-        console.error('Email error:', error);
-        throw error;
+        `
       });
+      
+      await storage.createContactMessage(data);
+      res.json({ success: true });
     } catch (error) {
       console.error('Contact form error:', error);
       res.status(400).json({ error: "Invalid form data" });
