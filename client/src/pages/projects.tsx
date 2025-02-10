@@ -15,7 +15,7 @@ const sampleProjects = [
     techStack: ["React", "Node.js", "PostgreSQL", "Stripe", "Docker"],
     demoUrl: "https://demo.example.com",
     githubUrl: "https://github.com/example/project",
-    reviews: [{ id: 1, projectId: 1, name: "John Doe", rating: 5, comment: "Excellent platform", date: new Date().toISOString() }]
+    reviews: [{ id: 1, projectId: 1, name: "John Doe", rating: 5, comment: "Excellent platform", date: new Date().toISOString(), customerAvatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d" }]
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const sampleProjects = [
     techStack: ["React Native", "Firebase", "Redux", "TypeScript"],
     demoUrl: "https://demo.example.com/fitness",
     githubUrl: "https://github.com/example/fitness",
-    reviews: [{ id: 2, projectId: 2, name: "Jane Smith", rating: 4, comment: "Great mobile app", date: new Date().toISOString() }]
+    reviews: [{ id: 2, projectId: 2, name: "Jane Smith", rating: 4, comment: "Great mobile app", date: new Date().toISOString(), customerAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330" }]
   },
   {
     id: 3,
@@ -43,7 +43,7 @@ const sampleProjects = [
     techStack: ["Electron", "TypeScript", "Monaco Editor", "Node.js"],
     demoUrl: "https://demo.example.com/editor",
     githubUrl: "https://github.com/example/editor",
-    reviews: [{ id: 3, projectId: 3, name: "Mike Johnson", rating: 5, comment: "Powerful IDE", date: new Date().toISOString() }]
+    reviews: [{ id: 3, projectId: 3, name: "Mike Johnson", rating: 5, comment: "Powerful IDE", date: new Date().toISOString(), customerAvatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36" }]
   },
   {
     id: 4,
@@ -57,7 +57,7 @@ const sampleProjects = [
     techStack: ["Solidity", "React", "Web3.js", "IPFS"],
     demoUrl: "https://demo.example.com/nft",
     githubUrl: "https://github.com/example/nft",
-    reviews: [{ id: 4, projectId: 4, name: "Alex Chen", rating: 5, comment: "Amazing NFT platform", date: new Date().toISOString() }]
+    reviews: [{ id: 4, projectId: 4, name: "Alex Chen", rating: 5, comment: "Amazing NFT platform", date: new Date().toISOString(), customerAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde" }]
   }
 ];
 
