@@ -159,13 +159,18 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
                           <p className="text-sm text-muted-foreground">{review.customerCompany}</p>
                         )}
                       </div>
-                      <div className="ml-auto flex items-center">
-                        {[...Array(review.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                        ))}
+                      <div className="ml-auto flex flex-col items-end gap-1">
+                        <div className="flex items-center">
+                          {[...Array(review.rating)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                          ))}
+                        </div>
+                        <time className="text-xs text-muted-foreground">
+                          {new Date(review.date).toLocaleDateString()}
+                        </time>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{review.review}</p>
+                    <p className="text-sm text-muted-foreground">{review.comment || review.review}</p>
                   </div>
                 ))}
               </div>
