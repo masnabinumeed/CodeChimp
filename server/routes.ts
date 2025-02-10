@@ -111,6 +111,30 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/contact", async (req, res) => {
     try {
       const data = insertContactSchema.parse(req.body);
+      const nodemailer = require('nodemailer');
+      
+      const transporter = nodemailer.createTransport({
+        host: 'techmonkeys.io',
+        port: 465,
+        secure: true,
+        auth: {
+          user: 'muneeb@techmonkeys.io',
+          pass: 'techMonkeys_01'
+        }
+      });
+
+      await transporter.sendMail({
+        from: 'muneeb@techmonkeys.io',
+        to: 'muneeb@techmonkeys.io',
+        subject: 'New Contact Form Submission',
+        text: `
+New contact form submission:
+Name: ${data.name}
+Email: ${data.email}
+Message: ${data.message}
+        `
+      });
+
       await storage.createContactMessage(data);
       res.json({ success: true });
     } catch (error) {
