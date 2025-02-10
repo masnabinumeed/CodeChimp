@@ -86,10 +86,10 @@ export default function Projects() {
             <button
               key={cat.value}
               onClick={() => setCategory(cat.value)}
-              className={`px-4 py-2 rounded-full ${
+              className={`px-4 py-2 rounded-full transition-colors duration-300 ${
                 category === cat.value
                   ? "bg-primary text-white"
-                  : "bg-gray-100 hover:bg-gray-200"
+                  : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
               {cat.label}
