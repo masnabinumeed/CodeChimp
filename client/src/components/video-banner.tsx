@@ -8,33 +8,36 @@ import { TeamSection } from "./team-section";
 
 export function VideoBanner() {
   const { data: homeMedia = [] } = useQuery<MediaAsset[]>({
-    queryKey: ["/api/media/home"]
+    queryKey: ["/api/media/home"],
   });
 
-  const videoAsset = homeMedia.find(asset => asset.type === "video");
-  const botIconAsset = homeMedia.find(asset => asset.type === "logo");
+  const videoAsset = homeMedia.find((asset) => asset.type === "video");
+  const botIconAsset = homeMedia.find((asset) => asset.type === "logo");
 
   const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const servicesSection = document.getElementById('services');
+    const servicesSection = document.getElementById("services");
     if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: 'smooth' });
+      servicesSection.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
-      <video 
-        autoPlay 
-        muted 
+      <video
+        autoPlay
+        muted
         loop
         playsInline
         className="absolute inset-0 w-full h-full object-cover scale-105"
         poster="https://images.unsplash.com/photo-1531297484001-80022131f5a1"
       >
-        <source 
-          src={videoAsset?.url || "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4"} 
-          type="video/mp4" 
+        <source
+          src={
+            videoAsset?.url ||
+            "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4"
+          }
+          type="video/mp4"
         />
       </video>
 
@@ -50,15 +53,7 @@ export function VideoBanner() {
           >
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
               <span className="flex items-center gap-4">
-                {botIconAsset ? (
-                  <img 
-                    src={botIconAsset.url} 
-                    alt="Tech Monkeys Logo" 
-                    className="w-12 h-12 animate-bounce"
-                  />
-                ) : (
-                  <Bot className="w-12 h-12 text-primary animate-bounce" />
-                )}
+                <Bot className="w-12 h-12 text-primary animate-bounce" />
                 <span>
                   <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
                     Tech Monkeys
@@ -68,12 +63,13 @@ export function VideoBanner() {
               Building Tomorrow's Technology Today
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mb-12 leading-relaxed">
-              We craft innovative solutions across web, mobile, and desktop platforms to bring your ideas to life.
+              We craft innovative solutions across web, mobile, and desktop
+              platforms to bring your ideas to life.
             </p>
 
             <div className="flex flex-wrap gap-6">
-              <a 
-                href="#services" 
+              <a
+                href="#services"
                 onClick={scrollToServices}
                 className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900"
               >
@@ -85,12 +81,14 @@ export function VideoBanner() {
               </a>
 
               <Link href="/projects">
-                <a className={cn(
-                  "inline-flex items-center justify-center px-6 py-3 rounded-full",
-                  "bg-white/10 backdrop-blur-lg text-white",
-                  "hover:bg-white/20 transition-colors duration-300",
-                  "border border-white/20 hover:border-white/40"
-                )}>
+                <a
+                  className={cn(
+                    "inline-flex items-center justify-center px-6 py-3 rounded-full",
+                    "bg-white/10 backdrop-blur-lg text-white",
+                    "hover:bg-white/20 transition-colors duration-300",
+                    "border border-white/20 hover:border-white/40",
+                  )}
+                >
                   View Projects
                 </a>
               </Link>

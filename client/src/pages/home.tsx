@@ -1,41 +1,59 @@
 import { VideoBanner } from "@/components/video-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Monitor, Smartphone, Globe, Brain, Cloud, ChevronRight, Bitcoin } from "lucide-react";
+import {
+  Monitor,
+  Smartphone,
+  Globe,
+  Brain,
+  Cloud,
+  ChevronRight,
+  Bitcoin,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { SiReact, SiTypescript, SiTailwindcss, SiNodedotjs, SiPostgresql, SiDocker } from "react-icons/si";
+import {
+  SiReact,
+  SiTypescript,
+  SiTailwindcss,
+  SiNodedotjs,
+  SiPostgresql,
+  SiDocker,
+} from "react-icons/si";
 
 const services = [
   {
     icon: Globe,
     title: "Web Development",
-    description: "Modern, responsive web applications built with cutting-edge technologies."
+    description:
+      "Modern, responsive web applications built with cutting-edge technologies.",
   },
   {
     icon: Smartphone,
     title: "Mobile App Development",
-    description: "Native and cross-platform mobile apps for iOS and Android."
+    description: "Native and cross-platform mobile apps for iOS and Android.",
   },
   {
     icon: Monitor,
     title: "Desktop Application Development",
-    description: "Powerful desktop applications for Windows, macOS, and Linux."
+    description: "Powerful desktop applications for Windows, macOS, and Linux.",
   },
   {
     icon: Bitcoin,
     title: "Web3 & Crypto Development",
-    description: "Blockchain solutions, smart contracts, and decentralized applications (dApps)."
+    description:
+      "Blockchain solutions, smart contracts, and decentralized applications (dApps).",
   },
   {
     icon: Brain,
     title: "AI & Automation Solutions",
-    description: "Smart solutions powered by machine learning and automation."
+    description: "Smart solutions powered by machine learning and automation.",
   },
   {
     icon: Cloud,
     title: "Cloud & DevOps Consulting",
-    description: "Expert guidance on cloud infrastructure and DevOps practices."
-  }
+    description:
+      "Expert guidance on cloud infrastructure and DevOps practices.",
+  },
 ];
 
 const container = {
@@ -43,14 +61,14 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2
-    }
-  }
+      staggerChildren: 0.2,
+    },
+  },
 };
 
 const item = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
+  show: { opacity: 1, y: 0 },
 };
 
 export default function Home() {
@@ -62,7 +80,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0aDR2NEgzNnpNNDAgMzBoNHY0aC00ek00NCAzNGg0djRoLTR6TTM0IDMwaDR2NGgtNHpNNDQgMzBoNHY0aC00ek0zMiAzNmg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
 
         <div className="container mx-auto px-4 relative">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -76,7 +94,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             variants={container}
             initial="hidden"
             whileInView="show"
@@ -112,7 +130,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
 
         <div className="container mx-auto px-4 relative">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -124,9 +142,10 @@ export default function Home() {
                   Why Choose Tech Monkeys?
                 </h2>
                 <p className="text-lg text-gray-300 leading-relaxed mb-8">
-                  We're a team of passionate developers and designers committed to delivering 
-                  exceptional software solutions. With years of experience across multiple 
-                  industries, we bring expertise and innovation to every project.
+                  We're a team of passionate developers and designers committed
+                  to delivering exceptional software solutions. With years of
+                  experience across multiple industries, we bring expertise and
+                  innovation to every project.
                 </p>
                 <Link href="/projects">
                   <a className="inline-flex items-center group">
@@ -154,7 +173,7 @@ export default function Home() {
                           { icon: SiTailwindcss, name: "Tailwind" },
                           { icon: SiNodedotjs, name: "Node.js" },
                           { icon: SiPostgresql, name: "PostgreSQL" },
-                          { icon: SiDocker, name: "Docker" }
+                          { icon: SiDocker, name: "Docker" },
                         ].map(({ icon: Icon, name }, index) => (
                           <div
                             key={name}
