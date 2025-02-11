@@ -98,29 +98,33 @@ const sampleProjects = [
   },
   {
     id: 4,
-    title: "NFT Marketplace",
-    description: "Decentralized marketplace for trading digital collectibles",
+    title: "Decentralized App for File Storage",
+    description:
+      "Decentralized P2P file-sharing with encrypted storage, powered by WebRTC and blockchain for unmatched security and scalability.",
     longDescription:
-      "A Web3 platform for minting, buying, and selling NFTs with wallet integration.",
+      "We developed a cutting-edge decentralized P2P file-sharing platform leveraging the power of WebRTC and Metered.ca's STUN/TURN servers for seamless peer-to-peer connectivity. This innovative solution includes a robust server application that offers encrypted, compressed storage as a service, rented in exchange for cryptocurrency, ensuring secure and scalable data management. Complementing this is the client application, designed to access and utilize this storage effortlessly, delivering unmatched performance and privacy. With end-to-end encryption, blockchain-powered transactions, and decentralized architecture, this platform redefines file-sharing by eliminating central points of failure and enhancing user autonomy. Built to empower the future of secure, scalable, and efficient digital data sharing.",
     category: "web3",
-    imageUrls: ["https://images.unsplash.com/photo-1644658722893-2f1564623412"],
-    screenshots: [
-      "https://images.unsplash.com/photo-1644658722893-2f1564623412",
+    imageUrls: [
+      "uploads/P2pFileStorage/1.PNG",
+      "uploads/P2pFileStorage/2.PNG",
+      "uploads/P2pFileStorage/3.png",
     ],
+    screenshots: [],
     videoUrls: [],
-    techStack: ["Solidity", "React", "Web3.js", "IPFS"],
-    demoUrl: "https://demo.example.com/nft",
+    techStack: ["Electron", "React", "Web3.js", "WebRTC"],
+    demoUrl:
+      "https://www.frynetworks.com/product-page/fry-storage-decentralization-node",
     githubUrl: "https://github.com/example/nft",
     reviews: [
       {
         id: 4,
         projectId: 4,
-        name: "Alex Chen",
+        name: "Samuel Fry",
         rating: 5,
-        comment: "Amazing NFT platform",
-        date: "Sept 30, 2024",
-        customerAvatar:
-          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde",
+        comment:
+          "Exceptional developer! Delivered a flawless decentralized solution and exceeded expectations—looking forward to collaborating on more complex projects!",
+        date: "Aug 8, 2024",
+        customerAvatar: "uploads/P2pFileStorage/Samuel.jpeg",
       },
     ],
   },
