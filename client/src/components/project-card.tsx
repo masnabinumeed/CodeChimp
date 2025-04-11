@@ -1,7 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, Star, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  ExternalLink,
+  Github,
+  Star,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import type { Project, ProjectReview } from "@shared/schema";
@@ -25,7 +31,9 @@ export function ProjectCard({ project, reviews = [] }: ProjectCardProps) {
 
   const prevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + allImages.length) % allImages.length,
+    );
   };
 
   return (
@@ -38,8 +46,8 @@ export function ProjectCard({ project, reviews = [] }: ProjectCardProps) {
       >
         <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer">
           <div className="aspect-video relative overflow-hidden">
-            <img 
-              src={allImages[currentImageIndex]} 
+            <img
+              src={allImages[currentImageIndex]}
               alt={`${project.title} - ${currentImageIndex + 1}/${allImages.length}`}
               className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
             />
@@ -85,49 +93,14 @@ export function ProjectCard({ project, reviews = [] }: ProjectCardProps) {
 
             <div className="flex flex-wrap gap-2 mb-6">
               {project.techStack.map((tech) => (
-                <Badge 
-                  key={tech} 
+                <Badge
+                  key={tech}
                   variant="outline"
                   className="bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
                 >
                   {tech}
                 </Badge>
               ))}
-            </div>
-
-            <div className="flex gap-3">
-              {project.demoUrl && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="group/btn hover:border-primary hover:text-primary transition-colors duration-300"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (project.demoUrl) {
-                      window.open(project.demoUrl, '_blank');
-                    }
-                  }}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
-                  Demo
-                </Button>
-              )}
-              {project.githubUrl && (
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="group/btn hover:border-primary hover:text-primary transition-colors duration-300"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (project.githubUrl) {
-                      window.open(project.githubUrl, '_blank');
-                    }
-                  }}
-                >
-                  <Github className="h-4 w-4 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
-                  Code
-                </Button>
-              )}
             </div>
           </CardContent>
         </Card>
