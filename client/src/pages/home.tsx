@@ -90,24 +90,24 @@ const reviews = [
     name: "AnyBiz Worldwide",
     rating: 5,
     text: "Working with Tech Monkeys was a game-changer for our business. Their tech expertise and creativity helped us launch a platform that our customers love. The ongoing support has been incredible, making this a fantastic partnership.",
-    image: "/uploads/anybiz.jpg",
+    image: "/uploads/anybiz.svg",
   },
 ];
 
 const projects = [
   {
     title: "CAR CONFIGURATOR",
-    image: "/uploads/car-configurator.png",
+    image: "/uploads/car-configurator.svg",
     type: "3D Interactive Experience",
   },
   {
     title: "ADMIN DASHBOARD",
-    image: "/uploads/admin-dashboard.png",
+    image: "/uploads/admin-dashboard.svg",
     type: "Data Visualization & Management",
   },
   {
     title: "CUSTOM CRM",
-    image: "/uploads/crm.png",
+    image: "/uploads/crm.svg",
     type: "Business Process Automation",
   },
 ];
@@ -383,25 +383,25 @@ export default function Home() {
             <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center">
                 <div className="inline-block p-3 rounded-full bg-purple-900/20 mb-3">
-                  <img src="/uploads/Twitter.png" alt="Twitter" className="w-6 h-6" />
+                  <img src="/uploads/Twitter.svg" alt="Twitter" className="w-6 h-6" />
                 </div>
                 <p className="text-sm text-gray-500">Twitter</p>
               </div>
               <div className="text-center">
                 <div className="inline-block p-3 rounded-full bg-purple-900/20 mb-3">
-                  <img src="/uploads/Upwork.png" alt="Upwork" className="w-6 h-6" />
+                  <img src="/uploads/Upwork.svg" alt="Upwork" className="w-6 h-6" />
                 </div>
                 <p className="text-sm text-gray-500">Upwork</p>
               </div>
               <div className="text-center">
                 <div className="inline-block p-3 rounded-full bg-purple-900/20 mb-3">
-                  <img src="/uploads/Fiverr.png" alt="Fiverr" className="w-6 h-6" />
+                  <img src="/uploads/Fiverr.svg" alt="Fiverr" className="w-6 h-6" />
                 </div>
                 <p className="text-sm text-gray-500">Fiverr</p>
               </div>
               <div className="text-center">
                 <div className="inline-block p-3 rounded-full bg-purple-900/20 mb-3">
-                  <img src="/uploads/LinkedIn.png" alt="LinkedIn" className="w-6 h-6" />
+                  <img src="/uploads/LinkedIn.svg" alt="LinkedIn" className="w-6 h-6" />
                 </div>
                 <p className="text-sm text-gray-500">LinkedIn</p>
               </div>
