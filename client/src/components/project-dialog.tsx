@@ -6,7 +6,13 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Github, ChevronLeft, ChevronRight, Star } from "lucide-react";
+import {
+  ExternalLink,
+  Github,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+} from "lucide-react";
 import { useState } from "react";
 import type { Project, ProjectReview } from "@shared/schema";
 import { cn } from "@/lib/utils";
@@ -18,22 +24,30 @@ interface ProjectDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function ProjectDialog({ project, reviews = [], open, onOpenChange }: ProjectDialogProps) {
+export function ProjectDialog({
+  project,
+  reviews = [],
+  open,
+  onOpenChange,
+}: ProjectDialogProps) {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const allMedia = [
     ...project.imageUrls,
     ...project.screenshots,
-    ...project.videoUrls
+    ...project.videoUrls,
   ];
 
-  const isVideo = (url: string) => url.endsWith('.mp4') || url.includes('youtube.com');
+  const isVideo = (url: string) =>
+    url.endsWith(".mp4") || url.includes("youtube.com");
 
   const nextMedia = () => {
     setCurrentMediaIndex((prev) => (prev + 1) % allMedia.length);
   };
 
   const prevMedia = () => {
-    setCurrentMediaIndex((prev) => (prev - 1 + allMedia.length) % allMedia.length);
+    setCurrentMediaIndex(
+      (prev) => (prev - 1 + allMedia.length) % allMedia.length,
+    );
   };
 
   return (
@@ -95,14 +109,12 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
                 onClick={() => setCurrentMediaIndex(index)}
                 className={cn(
                   "relative flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border border-border",
-                  currentMediaIndex === index && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                  currentMediaIndex === index &&
+                    "ring-2 ring-primary ring-offset-2 ring-offset-background",
                 )}
               >
                 {isVideo(media) ? (
-                  <video
-                    src={media}
-                    className="w-full h-full object-cover"
-                  />
+                  <video src={media} className="w-full h-full object-cover" />
                 ) : (
                   <img
                     src={media}
@@ -127,11 +139,7 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
             <h3 className="text-lg font-semibold">Technologies Used</h3>
             <div className="flex flex-wrap gap-2">
               {project.techStack.map((tech) => (
-                <Badge 
-                  key={tech} 
-                  variant="outline"
-                  className="bg-primary/5"
-                >
+                <Badge key={tech} variant="outline" className="bg-primary/5">
                   {tech}
                 </Badge>
               ))}
@@ -156,13 +164,18 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
                       <div>
                         <p className="font-medium">{review.name}</p>
                         {review.customerCompany && (
-                          <p className="text-sm text-muted-foreground">{review.customerCompany}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {review.customerCompany}
+                          </p>
                         )}
                       </div>
                       <div className="ml-auto flex flex-col items-end gap-1">
                         <div className="flex items-center">
                           {[...Array(review.rating)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                            <Star
+                              key={i}
+                              className="w-4 h-4 fill-primary text-primary"
+                            />
                           ))}
                         </div>
                         <time className="text-xs text-muted-foreground">
@@ -170,7 +183,9 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
                         </time>
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground">{review.comment || review.review}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {review.comment || review.review}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -178,34 +193,6 @@ export function ProjectDialog({ project, reviews = [], open, onOpenChange }: Pro
           )}
 
           {/* Links */}
-          <div className="flex gap-3">
-            {project.demoUrl && (
-              <Button variant="outline" asChild>
-                <a 
-                  href={project.demoUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View Demo
-                </a>
-              </Button>
-            )}
-            {project.githubUrl && (
-              <Button variant="outline" asChild>
-                <a 
-                  href={project.githubUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center"
-                >
-                  <Github className="h-4 w-4 mr-2" />
-                  View Code
-                </a>
-              </Button>
-            )}
-          </div>
         </div>
       </DialogContent>
     </Dialog>
