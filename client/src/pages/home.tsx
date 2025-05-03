@@ -88,7 +88,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent font-display">
+            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent font-display">
               Our Services
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -140,7 +140,7 @@ export default function Home() {
           >
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent font-display">
+                <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-display">
                   Why Choose Tech Monkeys?
                 </h2>
                 <p className="text-lg text-gray-300 leading-relaxed mb-8">
@@ -152,7 +152,7 @@ export default function Home() {
                 <Link href="/projects">
                   <a className="inline-flex items-center group">
                     <span className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px]">
-                      <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-purple-400 to-primary" />
+                      <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-secondary to-primary" />
                       <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl">
                         View Our Projects
                         <ChevronRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />

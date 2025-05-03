@@ -50,7 +50,7 @@ export function TeamSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-3xl md:text-4xl font-bold text-white mb-12 text-center"
+        className="text-3xl md:text-4xl font-bold text-white mb-12 text-center font-display"
       >
         Meet Our Tech Innovation Team
       </motion.h2>
@@ -63,8 +63,8 @@ export function TeamSection() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
             className={cn(
-              "min-w-[300px] snap-center bg-gray-900/50 backdrop-blur-sm rounded-xl p-6",
-              "border border-white/10 hover:border-primary/50 transition-colors duration-300",
+              "min-w-[300px] snap-center bg-black/70 backdrop-blur-sm rounded-xl p-6",
+              "border border-primary/20 hover:border-primary/60 transition-colors duration-300",
               "flex flex-col items-center text-center",
             )}
           >
@@ -75,18 +75,22 @@ export function TeamSection() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-white mb-1 font-display">
               {member.name}
             </h3>
-            <p className="text-sm text-primary mb-4">{member.role}</p>
+            <p className="text-sm text-secondary mb-4">{member.role}</p>
             <p className="text-gray-300 text-sm leading-relaxed mb-4">
               {member.description}
             </p>
             <div className="flex flex-wrap gap-2 justify-center">
-              {member.expertise.map((skill) => (
+              {member.expertise.map((skill, skillIndex) => (
                 <span
                   key={skill}
-                  className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary border border-primary/20"
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    skillIndex % 2 === 0
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "bg-secondary/10 text-secondary border border-secondary/20"
+                  }`}
                 >
                   {skill}
                 </span>

@@ -51,7 +51,7 @@ export function VideoBanner() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-3xl"
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 font-display">
               <span className="flex items-center gap-4">
                 {botIconAsset ? (
                   <img
@@ -63,7 +63,7 @@ export function VideoBanner() {
                   <Bot className="w-12 h-12 text-primary animate-bounce" />
                 )}
                 <span>
-                  <span className="bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
                     Tech Monkeys
                   </span>
                 </span>
@@ -81,7 +81,7 @@ export function VideoBanner() {
                 onClick={scrollToServices}
                 className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900"
               >
-                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-purple-400 to-primary" />
+                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-secondary to-primary" />
                 <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-gray-800">
                   Explore Our Services
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -92,9 +92,9 @@ export function VideoBanner() {
                 <a
                   className={cn(
                     "inline-flex items-center justify-center px-6 py-3 rounded-full",
-                    "bg-white/10 backdrop-blur-lg text-white",
-                    "hover:bg-white/20 transition-colors duration-300",
-                    "border border-white/20 hover:border-white/40",
+                    "bg-secondary/20 backdrop-blur-lg text-white",
+                    "hover:bg-secondary/30 transition-colors duration-300",
+                    "border border-secondary/40 hover:border-secondary/60",
                   )}
                 >
                   View Projects
