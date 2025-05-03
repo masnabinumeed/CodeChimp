@@ -88,7 +88,7 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent">
+            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent font-display">
               Our Services
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -140,7 +140,7 @@ export default function Home() {
           >
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
+                <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent font-display">
                   Why Choose Tech Monkeys?
                 </h2>
                 <p className="text-lg text-gray-300 leading-relaxed mb-8">
