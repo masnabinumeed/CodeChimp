@@ -78,13 +78,13 @@ const reviews = [
     name: "PandaTechnologies",
     rating: 5,
     text: "Our collaboration has been transformational. Tech Monkeys understood our needs and delivered a solution that exceeded our expectations. The attention to detail and commitment to quality shines through in every aspect of the project.",
-    image: "/uploads/panda.jpg",
+    image: "/uploads/panda.svg",
   },
   {
     name: "Rapid Innovations",
     rating: 5,
     text: "Tech Monkeys completely transformed our digital presence. Their team was responsive, professional, and delivered an exceptional product on time and within budget. We appreciate their expertise and innovative approach.",
-    image: "/uploads/rapid.jpg",
+    image: "/uploads/rapid.svg",
   },
   {
     name: "AnyBiz Worldwide",
