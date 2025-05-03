@@ -1,7 +1,0 @@
-<svg width="800" height="250" viewBox="0 0 800 250" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="250" fill="#191919" />
-  <rect x="150" y="50" width="500" height="150" rx="8" fill="#2A2A2A" />
-  <path d="M400 65 L450 110 L500 80 L550 115 L400 180 L300 120 L350 90 Z" fill="#6D28D9" />
-  <circle cx="330" cy="90" r="20" fill="#9333EA" />
-  <text x="340" y="180" fill="white" font-family="Arial" font-size="20" font-weight="bold">CAR CONFIGURATOR</text>
-</svg>
