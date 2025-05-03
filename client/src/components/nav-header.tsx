@@ -11,7 +11,7 @@ export function NavHeader() {
       animate={{ y: 0 }}
       className="fixed top-0 w-full z-50"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-800/95 to-gray-900/95 backdrop-blur-sm border-b border-white/10" />
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm border-b border-primary/20" />
 
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between relative">
         <Link href="/">
@@ -19,8 +19,8 @@ export function NavHeader() {
             whileHover={{ scale: 1.05 }}
             className="relative group cursor-pointer"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-lg opacity-75 group-hover:opacity-100 blur transition duration-200" />
-            <span className="relative text-2xl font-bold text-white">
+            <div className="absolute -inset-1 bg-gradient-to-r from-primary via-secondary to-primary rounded-lg opacity-75 group-hover:opacity-100 blur transition duration-200" />
+            <span className="relative text-2xl font-bold text-white font-display">
               Tech Monkeys
             </span>
           </motion.div>
@@ -55,10 +55,10 @@ function NavLink({ href, children, active }: { href: string; children: React.Rea
           "relative text-sm font-medium cursor-pointer",
           "before:absolute before:-bottom-1 before:h-0.5 before:w-full before:origin-left",
           "before:scale-x-0 hover:before:scale-x-100 before:transition-transform before:duration-300",
-          "before:bg-gradient-to-r before:from-primary before:to-purple-400",
+          "before:bg-gradient-to-r before:from-primary before:to-secondary",
           active 
             ? "text-white before:scale-x-100" 
-            : "text-gray-400 hover:text-white transition-colors duration-300"
+            : "text-primary/60 hover:text-white transition-colors duration-300"
         )}
       >
         {children}

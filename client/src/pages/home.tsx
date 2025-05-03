@@ -75,11 +75,11 @@ const item = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <div className="min-h-screen bg-black text-white">
       <VideoBanner />
 
       <section id="services" className="py-24 relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMyMjIiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0aDR2NEgzNnpNNDAgMzBoNHY0aC00ek00NCAzNGg0djRoLTR6TTM0IDMwaDR2NGgtNHpNNDQgMzBoNHY0aC00ek0zMiAzNmg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmNDY3ZGEiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PHBhdGggZD0iTTM2IDM0aDR2NEgzNnpNNDAgMzBoNHY0aC00ek00NCAzNGg0djRoLTR6TTM0IDMwaDR2NGgtNHpNNDQgMzBoNHY0aC00ek0zMiAzNmg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-70" />
 
         <div className="container mx-auto px-4 relative">
           <motion.div
@@ -105,7 +105,7 @@ export default function Home() {
           >
             {services.map((service) => (
               <motion.div key={service.title} variants={item}>
-                <Card className="group relative overflow-hidden border-none bg-white/5 backdrop-blur hover:bg-white/10 transition-all duration-300 h-full">
+                <Card className="group relative overflow-hidden border-none bg-black/70 backdrop-blur hover:bg-black/50 border border-primary/20 transition-all duration-300 h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
                   <CardHeader>
                     <div className="relative">
@@ -153,7 +153,7 @@ export default function Home() {
                   <a className="inline-flex items-center group">
                     <span className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px]">
                       <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-secondary to-primary" />
-                      <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl">
+                      <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-black px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl">
                         View Our Projects
                         <ChevronRight className="ml-2 h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
                       </span>
