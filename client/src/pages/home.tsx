@@ -163,10 +163,10 @@ export default function Home() {
               </div>
               <div className="relative">
                 <div className="absolute -inset-4">
-                  <div className="w-full h-full mx-auto rotate-12 rounded-3xl bg-gradient-to-r from-primary to-purple-600 opacity-30 blur-3xl" />
+                  <div className="w-full h-full mx-auto rotate-12 rounded-3xl bg-gradient-to-r from-primary to-secondary opacity-30 blur-3xl" />
                 </div>
                 <div className="relative">
-                  <div className="aspect-square rounded-2xl bg-gray-900/50 backdrop-blur-sm p-8 ring-1 ring-gray-800">
+                  <div className="aspect-square rounded-2xl bg-black/70 backdrop-blur-sm p-8 ring-1 ring-primary/30">
                     <div className="flex flex-col h-full justify-between">
                       <div className="grid grid-cols-2 gap-6">
                         {[
@@ -179,10 +179,22 @@ export default function Home() {
                         ].map(({ icon: Icon, name }, index) => (
                           <div
                             key={name}
-                            className="flex flex-col items-center gap-2 p-4 rounded-lg bg-gray-800/50 hover:bg-gray-800 transition-colors group"
+                            className={`flex flex-col items-center gap-2 p-4 rounded-lg ${
+                              index % 2 === 0 
+                                ? "bg-primary/10 hover:bg-primary/20" 
+                                : "bg-secondary/10 hover:bg-secondary/20"
+                            } transition-colors group`}
                           >
-                            <Icon className="w-8 h-8 text-gray-400 group-hover:text-primary transition-colors" />
-                            <span className="text-sm text-gray-400 group-hover:text-white transition-colors">
+                            <Icon className={`w-8 h-8 ${
+                              index % 2 === 0 
+                                ? "text-primary/60 group-hover:text-primary" 
+                                : "text-secondary/60 group-hover:text-secondary"
+                            } transition-colors`} />
+                            <span className={`text-sm ${
+                              index % 2 === 0 
+                                ? "text-primary/80 group-hover:text-white" 
+                                : "text-secondary/80 group-hover:text-white"
+                            } transition-colors font-medium`}>
                               {name}
                             </span>
                           </div>
