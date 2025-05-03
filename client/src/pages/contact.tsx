@@ -50,14 +50,14 @@ export default function Contact() {
   });
 
   return (
-    <div className="min-h-screen pt-16">
+    <div className="min-h-screen pt-16 bg-black text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">Contact Us</h1>
+          <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent font-display">Contact Us</h1>
 
-          <Card>
+          <Card className="bg-black/70 border border-primary/20 text-white">
             <CardHeader>
-              <CardTitle>Send us a message</CardTitle>
+              <CardTitle className="text-secondary font-display">Send us a message</CardTitle>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -111,7 +111,11 @@ export default function Contact() {
                     )}
                   />
 
-                  <Button type="submit" disabled={mutation.isPending}>
+                  <Button 
+                    type="submit" 
+                    disabled={mutation.isPending}
+                    className="bg-primary hover:bg-secondary text-white"
+                  >
                     {mutation.isPending ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
@@ -148,9 +152,9 @@ function SocialLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+      className="p-2 rounded-full hover:bg-primary/20 transition-colors"
     >
-      <Icon className="h-6 w-6 text-muted-foreground" />
+      <Icon className="h-6 w-6 text-primary hover:text-secondary transition-colors" />
     </a>
   );
 }

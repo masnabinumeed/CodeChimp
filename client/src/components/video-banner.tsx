@@ -41,7 +41,7 @@ export function VideoBanner() {
         />
       </video>
 
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/70 to-gray-900" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black" />
 
       <div className="relative container mx-auto px-4 min-h-screen flex flex-col">
         <div className="flex-1 flex items-center">
@@ -68,7 +68,7 @@ export function VideoBanner() {
                   </span>
                 </span>
               </span>
-              Building Tomorrow's Technology Today
+              <span className="block mt-2">Building Tomorrow's Technology Today</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mb-12 leading-relaxed">
               We craft innovative solutions across web, mobile, and desktop
@@ -79,10 +79,10 @@ export function VideoBanner() {
               <a
                 href="#services"
                 onClick={scrollToServices}
-                className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-900"
+                className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black"
               >
                 <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-secondary to-primary" />
-                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-gray-900 px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-gray-800">
+                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-black px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-black/90">
                   Explore Our Services
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </span>
