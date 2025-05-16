@@ -10,9 +10,11 @@ import NotFound from "@/pages/not-found";
 import MediaManager from "@/pages/admin/media";
 import ProjectManager from "@/pages/admin/projects";
 
+
+
 function Router() {
   return (
-    <div className="pt-16"> {/* Add padding-top equal to header height */}
+    <div className=""> {/* Add padding-top equal to header height */}
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/projects" component={Projects} />

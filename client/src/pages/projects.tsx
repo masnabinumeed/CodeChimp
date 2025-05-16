@@ -615,7 +615,7 @@ export default function Projects() {
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8">Our Projects</h1>
 
-        <div className="flex gap-4 mb-8">
+        {/* <div className="flex gap-4 mb-8">
           {categories.map((cat) => (
             <button
               key={cat.value}
@@ -639,7 +639,7 @@ export default function Projects() {
               reviews={project.reviews}
             />
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

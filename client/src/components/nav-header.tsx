@@ -9,32 +9,27 @@ export function NavHeader() {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 w-full z-50"
+      className="fixed inset-x-0 top-8 w-fit z-50 mx-auto"
     >
-      <div className="absolute inset-0 bg-black/90 backdrop-blur-sm border-b border-primary/20" />
-
-      <nav className="container mx-auto px-4 h-16 flex items-center justify-between relative">
+      <nav className="container mx-auto px-8 h-16 flex items-center justify-between relative gap-8 bg-secondary/20 border-secondary/20 border-1 backdrop-blur-md rounded-full">
         <Link href="/">
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05 }}
-            className="relative group cursor-pointer"
+            className="relative group cursor-pointer font-display font-bold uppercase text-lg"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-primary via-secondary to-primary rounded-lg opacity-75 group-hover:opacity-100 blur transition duration-200" />
-            <span className="relative text-2xl font-bold text-white font-display">
-              Tech Monkeys
-            </span>
+            CodeChimp
           </motion.div>
         </Link>
 
         <div className="flex gap-8 items-center">
           {[
             { href: "/", label: "Home" },
-            { href: "/projects", label: "Projects" },
-            { href: "/contact", label: "Contact" }
+            { href: "", label: "Projects" },
+            { href: "", label: "Contact" },
           ].map((link) => (
-            <NavLink 
-              key={link.href} 
-              href={link.href} 
+            <NavLink
+              key={link.href}
+              href={link.href}
               active={location === link.href}
             >
               {link.label}
@@ -46,19 +41,27 @@ export function NavHeader() {
   );
 }
 
-function NavLink({ href, children, active }: { href: string; children: React.ReactNode; active: boolean }) {
+function NavLink({
+  href,
+  children,
+  active,
+}: {
+  href: string;
+  children: React.ReactNode;
+  active: boolean;
+}) {
   return (
     <Link href={href}>
-      <motion.span 
+      <motion.span
         whileHover={{ y: -2 }}
         className={cn(
-          "relative text-sm font-medium cursor-pointer",
+          "relative font-medium cursor-pointer",
           "before:absolute before:-bottom-1 before:h-0.5 before:w-full before:origin-left",
           "before:scale-x-0 hover:before:scale-x-100 before:transition-transform before:duration-300",
           "before:bg-gradient-to-r before:from-primary before:to-secondary",
-          active 
-            ? "text-white before:scale-x-100" 
-            : "text-primary/60 hover:text-white transition-colors duration-300"
+          active
+            ? "text-white before:scale-x-100"
+            : "transition-colors duration-300",
         )}
       >
         {children}

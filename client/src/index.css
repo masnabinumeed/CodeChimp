@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased bg-background text-foreground text-lg;
   }
   :root {
 
@@ -82,6 +82,8 @@
 
     --secondary: 342 85% 68%; /* #f46796 */
 
+    --secondary: 320 85% 70%; /* #f467da */
+
     --secondary-foreground: 0 0% 100%;
 
     --muted: 280 20% 10%;
@@ -122,5 +124,32 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .btn-primary {
+    @apply relative inline-flex gap-2 hover:gap-3 hover:px-7 items-center font-bold bg-primary text-background h-12 overflow-hidden rounded-full px-6 hover:shadow-2xl hover:shadow-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black transition-all duration-300
+  }
+
+  .btn-secondary {
+    @apply inline-flex gap-2 hover:gap-3 hover:px-7 items-center font-bold h-12 px-6 rounded-full backdrop-blur-md text-primary border border-primary border-2 hover:shadow-2xl hover:shadow-primary transition-all duration-300
+  }
+
+  section, .section {
+    @apply py-32 px-6 relative max-w-screen-2xl mx-auto
+  }
+}
+
+.rotating-text {
+  animation: rotate 10s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+
   }
 }

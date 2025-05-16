@@ -4,15 +4,160 @@ import { motion } from "framer-motion";
 import { ArrowRight, Bot } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { MediaAsset } from "@shared/schema";
-import { TeamSection } from "./team-section";
+import {NoisyBackground} from "./noisybackground";
+
+import Floating, {
+  FloatingElement,
+} from "@/components/parallax-floating"
+
+// List of all SVG files in uploads/stack directory
+const stackFiles = [
+  "figma.svg", "html5.svg", "android.svg", "firebase.svg", "gitlab.svg", "js.svg", 
+   "python.svg", "aws.svg", "github.svg", "docker.svg", "reactjs.svg", 
+  "ruby.svg", "typescript.svg", "nodejs.svg", "postfresql.svg", "tailwind.svg"
+];
+
+// Predefined positions for a diagonal spread (bottom-left to top-right) - 16 positions
+const positionClasses = Array.from({ length: 16 }, (_, i) => {
+  const p = i / (16 - 1); // Normalized step from 0 (first item) to 1 (last item)
+  const leftPercent = 5 + p * 90;  // Ranges from 5% to 95% (left to right)
+  const topPercent = 95 - p * 90;   // Ranges from 95% down to 5% (bottom to top for element's top edge)
+  // FloatingElement already applies 'absolute', so we just provide top/left
+  return `left-[${leftPercent.toFixed(0)}%] top-[${topPercent.toFixed(0)}%]`;
+});
+
+interface StackItem {
+  url: string;
+  depth: number;
+  left: number; // Percentage value for left positioning (0-100)
+  top: number;  // Percentage value for top positioning (0-100)
+}
+
+const gridSize = 4; // 4x4 grid for 16 items
+const padding = 10; // percent padding from edges
+const available = 90 - 2 * padding; // available percent for grid
+const scatter = 8; // max scatter in percent
+
+const stackWithDetails: StackItem[] = stackFiles.map((fileName, index) => {
+  const row = Math.floor(index / gridSize);
+  const col = index % gridSize;
+
+  // Evenly distribute within the available area
+  let left = padding + (col * available) / (gridSize - 1);
+  let top = padding + (row * available) / (gridSize - 1);
+
+  // Add a small random scatter
+  left += (Math.random() - 0.5) * 2 * scatter;
+  top += (Math.random() - 0.5) * 2 * scatter;
+
+  // Clamp to keep on screen
+  left = Math.max(2, Math.min(98, left));
+  top = Math.max(2, Math.min(98, top));
+
+  return {
+    url: `/uploads/stack/${fileName}`,
+    depth: parseFloat((Math.random() * (0.8 - 0.2) + 0.2).toFixed(1)),
+    left: parseFloat(left.toFixed(1)),
+    top: parseFloat(top.toFixed(1)),
+  };
+});
+
+interface RenderStackElementsProps {
+  items: StackItem[];
+}
+
+const RenderStackElements: React.FC<RenderStackElementsProps> = ({ items }) => {
+  return (
+    <>
+      {items.map((item, index) => {
+        const imageBlur = Math.max(0, -0.5 * item.depth + 3.5);
+        const imageScale = item.depth + 0.6;
+
+        // scatterAmount and randomOffset logic as per user's latest version
+        const scatterAmount = 10;
+        const randomOffsetX = (Math.random() - 0.5) * 6 * scatterAmount;
+        const randomOffsetY = (Math.random() - 0.5) * 6 * scatterAmount;
+        // (Assuming baseLeftPercent and baseTopPercent are still calculated as before for finalLeftPercent, finalTopPercent)
+        // This part of the logic is in stackWithDetails, not directly here, but noting for context.
+
+        // Increase the range for xMove and yMove for more floating
+        let xMove = Math.round(Math.random() * 40 + 4); // Now moves between 4px and 44px
+        let yMove = Math.round(Math.random() * 40 + 4); // Now moves between 4px and 44px
+
+        let doesXMove = Math.random() < 0.7;
+        let doesYMove = Math.random() < 0.7;
+        if (!doesXMove && !doesYMove) {
+          if (Math.random() < 0.5) doesXMove = true; else doesYMove = true;
+        }
+        const xAnim = doesXMove ? [`-${xMove}px`, `${xMove}px`] : ["0px", "0px"];
+        const yAnim = doesYMove ? [`-${yMove}px`, `${yMove}px`] : ["0px", "0px"];
+
+        // Calculate z-index based on depth (REVERSED: smaller depth = lower z-index)
+        // Depth range [0.2, 0.8] maps to z-index range [6, 19]
+        const minDepth = 0.2, maxDepth = 0.8;
+        const minZ = 6, maxZ = 19;
+        const normalizedDepth = (item.depth - minDepth) / (maxDepth - minDepth);
+        const zIndex = Math.round(minZ + normalizedDepth * (maxZ - minZ));
+
+        const itemStyle = {
+          '--item-left': `${item.left}%`,
+          '--item-top': `${item.top}%`,
+          zIndex: zIndex, // Apply calculated z-index
+        } as React.CSSProperties;
+
+        return (
+          <FloatingElement
+            key={index}
+            depth={item.depth}
+            style={itemStyle}
+          >
+            <motion.img
+              initial={{ opacity: 0, y: "0px", x: "0px", scale: imageScale }}
+              animate={{ opacity: 1, y: yAnim, x: xAnim, scale: imageScale }}
+              transition={{
+                opacity: { duration: 0.5, delay: index * 0.1 },
+                y: {
+                  duration: 2.5 + (index % 5) * 0.2,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  ease: "easeInOut"
+                },
+                x: {
+                  duration: 2.5 + (index % 5) * 0.2,
+                  repeat: Infinity,
+                  repeatType: "mirror",
+                  ease: "easeInOut"
+                }
+              }}
+              style={{
+                filter: `blur(${imageBlur}px)`
+              }}
+              src={item.url}
+              alt={fileNameToAltText(item.url)}
+              className="size-20 lg:size-24 2xl:size-28 p-2 rounded-full bg-primary/20 backdrop-blur-sm object-contain hover:scale-105 duration-200 transition-transform"
+            />
+          </FloatingElement>
+        );
+      })}
+    </>
+  );
+};
+
+// Helper function to generate alt text from URL
+const fileNameToAltText = (url: string) => {
+  const fileName = url.substring(url.lastIndexOf('/') + 1);
+  const nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+  // Replace common separators with space and capitalize
+  return nameWithoutExtension.replace(/[-_.]/g, ' ').replace(/\b\w/g, char => char.toUpperCase()) + " Logo";
+};
 
 export function VideoBanner() {
   const { data: homeMedia = [] } = useQuery<MediaAsset[]>({
     queryKey: ["/api/media/home"],
   });
 
-  const videoAsset = homeMedia.find((asset) => asset.type === "video");
-  const botIconAsset = homeMedia.find((asset) => asset.type === "logo");
+  // const videoAsset = homeMedia.find((asset) => asset.type === "video"); // Not used currently
+  // const botIconAsset = homeMedia.find((asset) => asset.type === "logo"); // Not used currently
 
   const scrollToServices = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -23,89 +168,69 @@ export function VideoBanner() {
   };
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover scale-105"
-        poster="https://images.unsplash.com/photo-1531297484001-80022131f5a1"
-      >
-        <source
-          src={
-            videoAsset?.url ||
-            "https://static.videezy.com/system/resources/previews/000/051/958/original/code1291.mp4"
-          }
-          type="video/mp4"
-        />
-      </video>
+    <div className="relative h-svh w-full bg-gradient-to-tr from-primary via-background to-secondary outline outline-secondary/20 ">
+    
+    <div className="grid grid-cols-3 grid-rows-3 h-full z-10 p-6 py-16 gap-16 2xl:container mx-auto">
 
-      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/80 to-black" />
+      <svg className="z-20 row-start-2 col-start-2 justify-self-center" width={240} height={240} viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-      <div className="relative container mx-auto px-4 min-h-screen flex flex-col">
-        <div className="flex-1 flex items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="max-w-3xl"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 font-display">
-              <span className="flex items-center gap-4">
-                {botIconAsset ? (
-                  <img
-                    src="/uploads/TechMonkeys.png"
-                    alt="Tech Monkeys Logo"
-                    className="w-12 h-16"
-                  />
-                ) : (
-                  <Bot className="w-12 h-12 text-primary animate-bounce" />
-                )}
-                <span>
-                  <span className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                    Tech Monkeys
-                  </span>
-                </span>
-              </span>
-              <span className="block mt-2">Building Tomorrow's Technology Today</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mb-12 leading-relaxed">
-              We craft innovative solutions across web, mobile, and desktop
-              platforms to bring your ideas to life.
-            </p>
+   
+          <path className="rotating-text" d="M34.67 46.1154C34.8488 47.839 34.7463 49.6809 34.4179 51.6658C34.2423 52.7279 34.0022 53.8315 33.7066 54.9839C33.3198 56.4715 32.8425 57.9948 32.2859 59.5756C31.6201 61.4675 30.8401 63.4418 29.9721 65.5452C29.8069 65.9457 29.6457 66.3482 29.4887 66.7519C28.5624 69.1336 27.7792 71.5704 27.145 74.0453C26.4924 76.628 26.0676 78.7825 25.6915 81.5677C25.6442 81.9271 25.601 82.2798 25.5616 82.6236C17.2621 81.6115 8.96263 80.5994 0.66316 79.5873C0.714522 79.1479 0.768144 78.7174 0.823881 78.294C1.24591 75.0162 1.98274 71.1585 2.84808 67.8186C3.73144 64.3716 4.82207 60.9774 6.11202 57.6607C6.33064 57.0985 6.55519 56.5381 6.78528 55.9804C7.9939 53.0505 9.42039 50.4446 10.9796 48.1872C12.283 46.3001 13.6793 44.6555 15.1267 43.2562C16.2363 42.1679 17.3493 41.2462 18.4481 40.4841C20.5034 39.0591 22.5047 38.1927 24.3826 37.8284C27.2809 37.2248 29.6543 37.886 31.543 39.5451C33.4395 41.2093 34.4008 43.4342 34.67 46.1154ZM30.9759 119.328C31.4294 122.609 31.333 125.3 30.8196 128.006C30.7514 128.33 30.6744 128.648 30.5877 128.957C29.9468 131.225 28.726 133.014 26.8504 134.344C24.979 135.67 22.8072 136.172 20.3813 135.777C20.0526 135.724 19.7187 135.654 19.3796 135.565C16.6311 134.85 13.5512 132.731 10.7405 129.583C10.6572 129.489 10.5739 129.394 10.4909 129.298C8.43939 126.912 6.57815 123.955 5.06447 120.468C4.41537 118.972 3.83076 117.379 3.32451 115.697C2.757 113.811 2.33406 111.969 2.04425 110.189C1.46639 106.64 1.41688 103.344 1.79547 100.402C1.83715 100.077 1.88382 99.7589 1.93483 99.4457C2.58176 95.4853 3.94377 92.4271 5.74918 90.2965C6.16092 89.8111 6.59164 89.3834 7.03847 89.0123C8.71138 87.6239 10.6006 87.0321 12.6551 87.1083C14.7133 87.185 16.5379 87.9026 18.1788 89.1341C18.618 89.4638 19.0445 89.8305 19.4604 90.2325C21.288 92.0006 22.8046 94.2675 24.1814 97.0087C24.2905 97.2258 24.3988 97.4458 24.5063 97.669C25.4833 99.695 26.3415 101.904 27.1571 104.334C27.5665 105.552 27.9657 106.827 28.3674 108.162C28.7257 109.352 29.0589 110.504 29.3618 111.625C30.0685 114.236 30.6094 116.681 30.938 119.042C30.951 119.138 30.9636 119.233 30.9759 119.328ZM23.3665 121.219C23.8463 119.841 23.9664 118.21 23.795 116.303C23.7228 115.498 23.5979 114.661 23.4238 113.786C23.1847 112.583 22.8532 111.308 22.4427 109.944C21.9798 108.405 21.4995 107.019 20.9722 105.776C20.6809 105.089 20.3753 104.445 20.0515 103.845C19.1429 102.158 18.1468 100.882 16.991 100.032C15.8322 99.1488 14.5556 98.7554 13.1375 98.923C11.7219 99.0903 10.5631 99.782 9.70532 101.056C8.84417 102.29 8.30659 104.024 8.18508 106.243C8.14213 107.032 8.1554 107.868 8.22912 108.747C8.36251 110.337 8.69368 112.07 9.24848 113.914C9.74035 115.549 10.3341 117.016 11.0025 118.307C11.4892 119.246 12.0152 120.092 12.5725 120.843C13.8966 122.627 15.3097 123.798 16.7255 124.386C18.1445 124.976 19.492 124.912 20.7649 124.27C22.0398 123.627 22.888 122.596 23.3665 121.219ZM26.5385 56.5035C26.8541 54.7873 26.8854 53.2988 26.5785 52.0134C26.2624 50.6881 25.5853 49.6621 24.4929 48.9683C23.3835 48.2637 22.1543 48.0892 20.8027 48.5093C19.4777 48.9046 18.1039 49.8134 16.7462 51.2695C16.7023 51.3166 16.6584 51.3643 16.6145 51.4126C15.2155 52.9053 13.9222 54.9153 12.8515 57.4255C12.5035 58.2416 12.1684 59.0641 11.8469 59.8909C10.8108 62.5549 9.91294 65.2721 9.15777 68.0293C13.2651 69.1543 17.3724 70.2793 21.4797 71.4042C22.1184 69.0725 22.8776 66.7747 23.7538 64.5216C24.0258 63.8223 24.3093 63.1267 24.6036 62.4365C25.5089 60.315 26.1593 58.4186 26.507 56.671C26.5178 56.615 26.5282 56.5591 26.5385 56.5035ZM71.2504 28.5445C69.6565 29.0064 68.0806 29.5304 66.5274 30.115C64.1358 31.0151 61.7981 32.0588 59.5317 33.2387C57.2649 34.4186 55.0695 35.7346 52.9609 37.1772C50.7673 38.6887 49.0274 40.0282 46.9081 41.8744C45.5399 43.0788 44.503 44.0708 43.3769 45.2172C41.0159 41.6536 38.7591 38.0074 36.7101 34.1964C33.1007 31.8507 29.3122 29.7044 25.453 27.6714C27.0396 26.0466 28.8229 24.369 30.3702 23.0166C32.8488 20.8305 35.9464 18.4159 38.7992 16.4753C41.7361 14.4662 44.7939 12.6335 47.9506 10.9904C51.1069 9.34731 54.362 7.89393 57.6922 6.64058C59.7529 5.86498 61.8422 5.1659 63.9548 4.54527C64.4827 6.34218 65.0105 8.1391 65.5384 9.936C63.5593 10.5174 61.6018 11.1724 59.6713 11.899C56.5513 13.0732 53.5018 14.435 50.5448 15.9742C47.5874 17.5136 44.7227 19.2304 41.9713 21.1127C41.2332 21.6176 40.5042 22.134 39.7827 22.6624C41.0073 23.5893 42.216 24.5323 43.4068 25.492C43.7571 25.2438 44.1092 24.9988 44.4638 24.7562C47.0695 22.9736 49.7823 21.3477 52.5831 19.8899C55.3834 18.4321 58.2715 17.1424 61.2263 16.0304C62.5459 15.5337 63.8789 15.0726 65.2231 14.6473C65.7275 16.2414 66.2318 17.8356 66.7361 19.4297C65.4773 19.828 64.2291 20.2601 62.9933 20.7252C60.2263 21.7666 57.5216 22.9743 54.8992 24.3394C52.2765 25.7046 49.736 27.2271 47.296 28.8964C46.9639 29.1235 46.6342 29.3531 46.3062 29.5855C46.8379 31.012 47.3901 32.428 47.9633 33.832C48.565 33.3914 49.173 32.9609 49.7885 32.5399C52.0827 30.9704 54.4714 29.5387 56.9375 28.255C59.4032 26.9714 61.9463 25.8358 64.5481 24.8566C66.2379 24.2206 67.9524 23.6506 69.6865 23.1481C70.2078 24.9469 70.7291 26.7457 71.2504 28.5445ZM68.3631 156.337C69.5428 158.756 69.9236 161.206 69.2504 163.73C68.5789 166.245 66.9887 168.209 64.2903 169.43C62.2102 170.346 59.6368 170.797 56.6129 170.651C55.6669 170.605 54.6776 170.5 53.6486 170.332C51.2643 169.943 48.7383 169.207 46.1386 168.089C44.035 167.184 41.8836 166.029 39.7314 164.608C38.749 163.96 37.8174 163.29 36.9375 162.603C33.8693 160.21 31.4335 157.62 29.6249 155.008C29.5892 154.956 29.5538 154.905 29.5186 154.854C27.2263 151.514 26.0125 148.323 25.7164 145.492C25.6705 145.079 25.6456 144.677 25.6408 144.287C25.6138 141.979 26.2898 140.11 27.5433 138.655C28.1719 139.448 28.8166 140.229 29.4757 140.997C31.4287 143.274 33.5124 145.439 35.7134 147.477C35.5876 147.774 35.4935 148.081 35.4322 148.4C35.277 149.206 35.3313 150.083 35.6088 151.026C35.9813 152.358 36.7828 153.799 38.0469 155.294C38.7217 156.099 39.5243 156.903 40.4562 157.693C41.2255 158.346 42.0829 158.988 43.0283 159.612C45.1878 161.037 47.2746 161.991 49.1989 162.511C49.4132 162.569 49.6255 162.622 49.8358 162.669C51.926 163.161 53.7003 163.109 55.1163 162.59C56.5253 162.09 57.5057 161.14 58.0997 159.795C58.695 158.448 58.7467 157.086 58.3263 155.71C57.8955 154.352 57.0258 153.031 55.7521 151.687C55.6234 151.554 55.4911 151.422 55.3554 151.29C54.1356 150.105 52.6313 148.96 50.8391 147.777C50.0542 147.259 49.3019 146.786 48.5761 146.362C47.6971 145.847 46.8568 145.404 46.0461 145.035C44.5399 144.34 43.1714 143.926 41.9033 143.825C40.995 143.752 40.153 143.838 39.376 144.096C39.0689 144.198 38.772 144.327 38.4857 144.483C36.3992 142.551 34.4237 140.499 32.5723 138.341C31.9475 137.613 31.3364 136.872 30.7405 136.12C32.4352 135.216 34.3362 134.896 36.426 135.035C36.7795 135.059 37.1385 135.095 37.5033 135.145C39.9744 135.495 42.5259 136.369 45.2773 137.656C45.3196 137.675 45.362 137.695 45.4044 137.715C47.5642 138.724 49.7588 139.979 52.091 141.457C52.7602 141.88 53.4411 142.322 54.1365 142.781C55.6599 143.786 57.0804 144.761 58.4024 145.736C60.0358 146.94 61.5193 148.145 62.8601 149.394C63.4386 149.934 63.9849 150.471 64.4979 151.011C66.1364 152.735 67.4381 154.484 68.3631 156.337ZM118.865 11.1126C120.489 13.4961 120.956 15.8204 120.46 18.0083C119.211 17.4623 117.947 16.9487 116.671 16.4685C114.193 15.5355 111.666 14.7281 109.106 14.0504C109.032 13.208 108.729 12.4009 108.184 11.6383C107.996 11.3756 107.779 11.1181 107.533 10.8669C106.58 9.86579 105.196 8.96942 103.378 8.24206C102.112 7.72978 100.657 7.31939 99.0228 7.0393C98.3605 6.92584 97.6711 6.83392 96.952 6.76541C94.1318 6.49416 91.4589 6.68891 89.4897 7.26012C89.3334 7.3026 89.1808 7.34712 89.0313 7.39354C87.2617 7.94426 85.8384 8.7704 84.8946 9.80721C83.8661 10.9108 83.4516 12.2091 83.5565 13.6755C83.662 15.1441 84.259 16.371 85.2575 17.3899C86.1809 18.3106 87.3951 19.0271 89.0313 19.594C89.1693 19.6419 89.3092 19.6887 89.4509 19.7347C91.3137 20.3066 93.1893 20.6551 95.6074 20.8817C96.2045 20.9386 96.7796 20.9853 97.3372 21.0209C98.7126 21.1085 99.9713 21.126 101.127 21.055C102.783 20.9615 104.186 20.6854 105.353 20.1798C105.652 20.0503 105.934 19.9071 106.199 19.7492C106.967 19.2912 107.591 18.7106 108.062 17.9947C110.489 18.6371 112.884 19.4025 115.234 20.287C116.444 20.7423 117.642 21.2291 118.826 21.7467C117.571 23.6096 115.698 24.8993 113.311 25.7813C113.256 25.8014 113.2 25.8213 113.144 25.8409C110.801 26.6643 108.147 27.0728 105.127 27.2178C104.874 27.2308 104.62 27.2414 104.363 27.25C101.961 27.3306 99.4055 27.2172 96.6184 26.9829C96.1 26.9394 95.575 26.8919 95.0398 26.8409C92.8093 26.6357 91.1712 26.4113 89.0313 26.1012C87.1424 25.8324 85.7371 25.5041 84.2319 25.0939C83.1274 24.7978 82.0828 24.4723 81.0975 24.1073C79.2265 23.4146 77.5647 22.5789 76.1149 21.5446C73.9389 19.9623 72.4525 17.9771 71.8633 15.4324C71.2756 12.8962 71.7591 10.4157 73.5691 8.07165C74.7794 6.53567 76.4735 5.13393 78.6673 3.94995C79.8219 3.32701 81.1153 2.76535 82.5433 2.28176C84.5153 1.61429 86.8766 1.12624 89.0313 0.857516C91.388 0.547706 94.5897 0.520776 97.5195 0.806878C98.2757 0.878906 99.0154 0.968442 99.7419 1.07504C103.65 1.64866 107.108 2.70605 110.031 4.08931C110.343 4.23701 110.649 4.38846 110.949 4.54351C114.541 6.38998 117.129 8.6104 118.75 10.945C118.789 11.0008 118.827 11.0567 118.865 11.1126ZM152.588 152.163C151.469 153.307 150.318 154.42 149.137 155.501C146.514 157.905 143.746 160.152 140.853 162.224C137.961 164.297 134.944 166.196 131.824 167.908C131.395 168.143 130.963 168.375 130.53 168.604C127.456 170.225 124.533 171.25 121.895 171.76C121.411 171.854 120.936 171.931 120.472 171.99C117.43 172.389 114.973 172.091 113.162 171.259C111.353 170.444 110.264 169.155 109.816 167.477C109.372 165.817 109.665 164.178 110.575 162.537C111.493 160.915 113.004 159.389 115.053 157.842C115.365 157.604 115.688 157.368 116.022 157.133C117.845 155.852 119.989 154.615 122.465 153.31C122.814 153.126 123.162 152.939 123.508 152.749C126.021 151.37 128.452 149.84 130.782 148.17C131.196 147.874 131.607 147.573 132.014 147.267C130.457 145.189 128.899 143.11 127.342 141.032C129.023 139.772 130.643 138.428 132.192 137.008C133.04 136.232 133.866 135.433 134.671 134.612C140.643 140.462 146.616 146.313 152.588 152.163ZM145.219 59.5028C144.055 57.3512 142.767 55.2666 141.364 53.2629C140.893 52.5906 140.41 51.9278 139.914 51.2741C142.48 49.326 145.046 47.3776 147.612 45.4294C146.404 43.8388 145.132 42.2977 143.798 40.8106C141.816 38.6028 139.782 36.588 137.527 34.6077C135.995 33.2656 134.491 32.0524 132.894 30.8646C130.972 33.4508 129.051 36.0369 127.129 38.623C126.463 38.1281 125.787 37.6457 125.102 37.177C123.104 35.8104 121.029 34.5577 118.889 33.4265C122.796 26.0349 126.703 18.6433 130.611 11.2517C133.591 12.827 136.481 14.5721 139.263 16.4753C140.218 17.1282 141.16 17.8002 142.088 18.4894C140.246 20.9681 138.405 23.4468 136.563 25.9255C138.287 27.2046 140.011 28.5998 141.584 29.9813C143.933 32.0382 146.273 34.3488 148.38 36.7032C149.825 38.3148 151.204 39.9849 152.512 41.7086C154.972 39.8414 157.431 37.9742 159.89 36.107C160.582 37.0174 161.255 37.9404 161.91 38.8767C163.864 41.6671 165.658 44.5701 167.279 47.5661L145.219 59.5028ZM135.343 151.71C134.904 152.039 134.462 152.363 134.016 152.683C131.505 154.482 128.886 156.131 126.178 157.616C126.022 157.702 125.865 157.787 125.708 157.872C124.038 158.773 122.826 159.655 122.079 160.596C121.343 161.554 121.145 162.465 121.533 163.342C121.928 164.239 122.748 164.712 124.005 164.716C125.27 164.739 126.841 164.291 128.646 163.317C128.816 163.225 128.985 163.133 129.154 163.041C132.079 161.436 134.908 159.655 137.62 157.712C138.101 157.367 138.579 157.017 139.053 156.661L135.343 151.71ZM177.995 88.9364C178.03 92.2036 177.886 95.473 177.562 98.7242C177.18 98.9787 176.796 99.2296 176.412 99.4768C171.713 102.499 166.861 104.979 161.952 106.91C160.358 107.537 158.758 108.106 157.155 108.617C159.498 111.239 161.703 114.072 163.744 117.1C165.924 120.332 167.916 123.788 169.693 127.444C169.274 128.345 168.84 129.238 168.391 130.124C166.839 133.206 164.85 136.592 163.006 139.335C161.777 141.184 160.187 143.376 158.68 145.264L139.044 129.658C140.154 128.255 141.045 127.047 142.151 125.4C142.976 124.164 143.648 123.072 144.28 121.986C149.763 125.179 155.246 128.373 160.729 131.567C159.8 129.181 158.763 126.892 157.642 124.677C155.289 120.035 152.543 115.761 149.48 111.908C149.372 111.773 149.265 111.638 149.156 111.504C149.99 109.184 150.689 106.815 151.249 104.414C151.438 103.603 151.611 102.789 151.768 101.971C154.854 100.81 157.915 99.4126 160.923 97.7799C164.659 95.7515 168.312 93.3606 171.829 90.6158C165.525 90.5618 159.22 90.5079 152.915 90.454C152.919 90.0391 152.919 89.6248 152.914 89.21C152.876 86.5465 152.729 84.3555 152.371 81.5677C152.353 81.4327 152.335 81.2987 152.317 81.1659L177.174 77.8137C177.196 77.9747 177.218 78.1348 177.239 78.2941C177.679 81.5693 177.966 85.4863 177.995 88.9364ZM151.091 74.7369C151.034 74.5063 150.977 74.2755 150.918 74.0453C150.283 71.5704 149.5 69.1336 148.574 66.7519C148.408 66.3252 148.237 65.8999 148.062 65.4767C155.787 62.2795 163.513 59.0821 171.238 55.8848C171.482 56.4741 171.72 57.0665 171.951 57.6607C173.241 60.9774 174.331 64.3714 175.215 67.8184C175.297 68.139 175.377 68.4605 175.456 68.7816C167.334 70.7667 159.212 72.7518 151.091 74.7369Z" fill="#F467DA"/>
 
-            <div className="flex flex-wrap gap-6">
-              <a
-                href="#services"
-                onClick={scrollToServices}
-                className="relative inline-flex h-12 overflow-hidden rounded-full p-[2px] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-black"
-              >
-                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-gradient-to-r from-primary via-secondary to-primary" />
-                <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-black px-6 py-1 text-sm font-medium text-white backdrop-blur-3xl transition-colors hover:bg-black/90">
-                  Explore Our Services
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </span>
-              </a>
+          <rect width="213.333" height="213.333" transform="matrix(-1 0 0 1 287.152 73.5221)" fill="url(#pattern0_126_370)"/>
+          <defs>
+          <pattern id="pattern0_126_370" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlinkHref="#image0_126_370" transform="scale(0.0025)"/>
+          </pattern>
+          </defs>
 
-              <Link href="/projects">
-                <a
-                  className={cn(
-                    "inline-flex items-center justify-center px-6 py-3 rounded-full",
-                    "bg-secondary/20 backdrop-blur-lg text-white",
-                    "hover:bg-secondary/30 transition-colors duration-300",
-                    "border border-secondary/40 hover:border-secondary/60",
-                  )}
-                >
-                  View Projects
-                </a>
-              </Link>
-            </div>
-          </motion.div>
+
+          <image
+            href="/uploads/logo-chimp.png"
+            width="100"
+            height="100"
+            x="40"
+            y="52"
+            preserveAspectRatio="xMidYMid meet"
+          />
+        </svg>  
+    
+
+      <h1 className="col-start-1 row-start-1 col-span-1 text-5xl md:text-6xl font-bold text-white font-display  z-10 ">
+            Your partners for the AI-first future
+        </h1>
+
+      {/* Bottom-right cell for buttons */}
+      <div className="col-start-3 row-start-3 row-span-2 col-span-2 z-10 justify-self-end">
+
+        <div className="text-lg  font-display mb-4">
+          At <span className="text-primary font-bold uppercase">CodeChimp</span>, we're building next-generation software with the latest AI, cloud, and web technologies.
         </div>
 
-        <TeamSection />
+        <div className="flex flex-wrap gap-6">
+
+          <a
+            href="#services"
+            onClick={scrollToServices}
+            className="btn-primary w-fit"
+          >
+            <span>Explore Our Services</span>
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </a>
+          {/* <a href="/projects" className="btn-secondary w-fit">
+            View Projects
+          </a> */}
+        </div>
       </div>
+
     </div>
+
+    <Floating sensitivity={-1} className="w-full h-full absolute inset-0 z-[5]">
+    <RenderStackElements items={stackWithDetails}/>
+    </Floating>
+
+    <NoisyBackground />
+
+</div>
   );
 }

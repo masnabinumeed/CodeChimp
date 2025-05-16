@@ -1,5 +1,11 @@
 import { VideoBanner } from "@/components/video-banner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Testimonials } from "@/components/testimonials";
+import { Benefits } from "@/components/benefits";
+import { Footer } from "@/components/footer";
+import { ServiceCard } from "@/components/ui/service-card";
+import { BulbIcon, MobileIcon, WifiIcon, ComputerIcon, EthIcon, SettingsIcon } from "@/components/icons";
+import StackingCards, {StackingCardItem,} from "@/components/stacking-cards";
+
 import {
   Monitor,
   Smartphone,
@@ -8,6 +14,7 @@ import {
   Cloud,
   ChevronRight,
   Bitcoin,
+  ArrowRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
@@ -20,41 +27,46 @@ import {
   SiDocker,
 } from "react-icons/si";
 
-import { LampContainer } from "@/components/ui/lamp";
-
 const services = [
+  {
+    icon: Brain,
+    title: "AI & Automation Solutions",
+    description: "Intelligent systems leveraging advanced AI and automated workflows.",
+    illustration: BulbIcon
+  },
   {
     icon: Globe,
     title: "Web Development",
     description:
-      "Modern, responsive web applications built with cutting-edge technologies.",
+      "Dynamic web platforms crafted with modern frameworks and latest tools.",
+    illustration: WifiIcon
   },
   {
     icon: Smartphone,
     title: "Mobile App Development",
-    description: "Native and cross-platform mobile apps for iOS and Android.",
+    description: "Custom mobile solutions for both iOS and Android platforms.",
+    illustration: MobileIcon
   },
   {
     icon: Monitor,
     title: "Desktop Application Development",
-    description: "Powerful desktop applications for Windows, macOS, and Linux.",
+    description: "Robust desktop software for Windows, macOS, and Linux systems.",
+    illustration: ComputerIcon
   },
   {
     icon: Bitcoin,
     title: "Web3 & Crypto Development",
     description:
-      "Blockchain solutions, smart contracts, and decentralized applications (dApps).",
+      "Decentralized systems, smart contracts, and blockchain applications.",
+    illustration: EthIcon
   },
-  {
-    icon: Brain,
-    title: "AI & Automation Solutions",
-    description: "Smart solutions powered by machine learning and automation.",
-  },
+
   {
     icon: Cloud,
     title: "Cloud & DevOps Consulting",
     description:
-      "Expert guidance on cloud infrastructure and DevOps practices.",
+      "Professional support for cloud services and DevOps implementation.",
+    illustration: SettingsIcon
   },
 ];
 
@@ -75,25 +87,81 @@ const item = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen">
       <VideoBanner />
 
-      <section id="services" className="py-24 relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmNDY3ZGEiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PHBhdGggZD0iTTM2IDM0aDR2NEgzNnpNNDAgMzBoNHY0aC00ek00NCAzNGg0djRoLTR6TTM0IDMwaDR2NGgtNHpNNDQgMzBoNHY0aC00ek0zMiAzNmg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-70" />
+      <section
+        id="projects"
+        className=""
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+          <motion.div className="md:sticky top-24 h-fit"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            >
+            <h2 className="text-4xl  md:text-5xl  font-display mb-8 font-bold">
+              We develop <span className="text-primary">cutting-edge</span> AI solutions for web, mobile, and desktop
+              platforms to transform your <span className="text-primary">ideas into reality</span>
+            </h2>
+            {/* <div>
+              <a href="/projects" className="btn-secondary">
+                View All Projects
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            </div> */}
+          </motion.div>
 
-        <div className="container mx-auto px-4 relative">
+          <StackingCards totalCards={4}>
+            <StackingCardItem index={0}  className="h-[450px] top-24">
+            <div className="group h-full rounded-xl w-full bg-[url(https://images.unsplash.com/photo-1581287053822-fd7bf4f4bfec?q=80&w=4256&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover ">
+              <a href="" className="hidden group-hover:flex text-xl font-bold bg-background/60 w-full h-full justify-center items-center  transition-all duration-300">
+                AI-Powered Chatbot Platform</a>
+            </div>
+            </StackingCardItem>
+
+            <StackingCardItem index={1} className="h-[450px] top-24">
+            <div className="group h-full rounded-lg w-full bg-[url(https://images.unsplash.com/photo-1642132652806-8aa09801c2ab?q=80&w=3840&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover ">
+              <a href="" className="hidden group-hover:flex text-xl font-bold bg-background/60 w-full h-full justify-center items-center  transition-all duration-300">
+                E-Commerce Recommendation Engine</a>
+            </div>
+            </StackingCardItem>
+
+            <StackingCardItem index={2} className="h-[450px] top-24">
+            <div className="group h-full rounded-lg w-full bg-[url(https://images.unsplash.com/photo-1559028012-481c04fa702d?q=80&w=3850&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover border">
+              <a href="" className="hidden group-hover:flex text-xl font-bold bg-background/60 w-full h-full justify-center items-center  transition-all duration-300">
+                Mobile Health Tracker App</a>
+            </div>
+            </StackingCardItem>
+
+            <StackingCardItem index={3} className="h-[450px] top-24">
+            <div className="group h-full rounded-lg w-full bg-[url(https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=4740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)] bg-cover border">
+              <a href="" className="hidden group-hover:flex text-xl font-bold bg-background/60 w-full h-full justify-center items-center  transition-all duration-300">
+                Real-Time Collaboration Suite</a>
+            </div>
+            </StackingCardItem>
+          </StackingCards>
+
+        </div>
+      </section>
+
+      <section
+        id="services"
+        className=""
+      >
+        <div className="absolute inset-0 opacity-70" />
+
+        <div className="relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="mb-16"
           >
-            <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent font-display">
+            <h2 className="text-3xl uppercase font-bold mb-6 font-display">
               Our Services
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              We deliver cutting-edge solutions tailored to your unique needs
-            </p>
           </motion.div>
 
           <motion.div
@@ -101,34 +169,28 @@ export default function Home() {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" 
           >
             {services.map((service) => (
               <motion.div key={service.title} variants={item}>
-                <Card className="group relative overflow-hidden border-none bg-black/70 backdrop-blur hover:bg-black/50 border border-primary/20 transition-all duration-300 h-full">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                  <CardHeader>
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-primary/20 rounded-full scale-150 blur-2xl group-hover:bg-primary/30 transition-colors duration-300" />
-                      <service.icon className="h-12 w-12 text-primary relative" />
-                    </div>
-                    <CardTitle className="mt-4 text-xl text-white group-hover:text-primary transition-colors duration-300">
-                      {service.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-400 group-hover:text-gray-200 transition-colors duration-300">
-                      {service.description}
-                    </p>
-                  </CardContent>
-                </Card>
+                <ServiceCard
+                  title={service.title}
+                  description={service.description}
+                  icon={service.icon}
+                  illustration={service.illustration}
+                />
               </motion.div>
             ))}
           </motion.div>
         </div>
       </section>
 
-      <section className="py-24 relative overflow-hidden">
+      
+      <Benefits />
+      <Testimonials />
+
+      
+      {/* <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
 
         <div className="container mx-auto px-4 relative">
@@ -180,21 +242,25 @@ export default function Home() {
                           <div
                             key={name}
                             className={`flex flex-col items-center gap-2 p-4 rounded-lg ${
-                              index % 2 === 0 
-                                ? "bg-primary/10 hover:bg-primary/20" 
+                              index % 2 === 0
+                                ? "bg-primary/10 hover:bg-primary/20"
                                 : "bg-secondary/10 hover:bg-secondary/20"
                             } transition-colors group`}
                           >
-                            <Icon className={`w-8 h-8 ${
-                              index % 2 === 0 
-                                ? "text-primary/60 group-hover:text-primary" 
-                                : "text-secondary/60 group-hover:text-secondary"
-                            } transition-colors`} />
-                            <span className={`text-sm ${
-                              index % 2 === 0 
-                                ? "text-primary/80 group-hover:text-white" 
-                                : "text-secondary/80 group-hover:text-white"
-                            } transition-colors font-medium`}>
+                            <Icon
+                              className={`w-8 h-8 ${
+                                index % 2 === 0
+                                  ? "text-primary/60 group-hover:text-primary"
+                                  : "text-secondary/60 group-hover:text-secondary"
+                              } transition-colors`}
+                            />
+                            <span
+                              className={`text-sm ${
+                                index % 2 === 0
+                                  ? "text-primary/80 group-hover:text-white"
+                                  : "text-secondary/80 group-hover:text-white"
+                              } transition-colors font-medium`}
+                            >
                               {name}
                             </span>
                           </div>
@@ -212,7 +278,10 @@ export default function Home() {
             </div>
           </motion.div>
         </div>
-      </section>
+      </section> */}
+
+      <Footer />
+      
     </div>
   );
 }
